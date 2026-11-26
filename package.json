@@ -17,7 +17,8 @@
     "local:stop": "supabase stop",
     "local:migrate": "bash -c \". scripts/local-env.sh && drizzle-kit migrate\"",
     "local:seed": "bash -c \". scripts/local-env.sh && node scripts/seed-local.mjs\"",
-    "local:dev": "bash -c \". scripts/local-env.sh && next dev\""
+    "local:dev": "bash -c \". scripts/local-env.sh && next dev\"",
+    "local:check": "bash -c \". scripts/local-env.sh && tsx --conditions=react-server scripts/check-trading.ts\""
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -45,6 +46,7 @@
     "eslint-config-next": "16.4.6",
     "supabase": "^3.4.0",
     "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
