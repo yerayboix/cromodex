@@ -168,18 +168,26 @@ export async function makeOffer(input: {
   });
 }
 
-/** Locks an open negotiation and its listing; returns the caller's side. */
+/**
+ * Locks a negotiation's listing, then the negotiation itself (always in
+ * that order, like the listing-level operations, to avoid deadlocks), and
+ * returns the caller's side.
+ */
 async function lockNegotiation(tx: Tx, userId: string, negotiationId: string) {
+  const [ref] = await tx
+    .select({ listingId: negotiations.listingId })
+    .from(negotiations)
+    .where(eq(negotiations.id, negotiationId));
+  if (!ref) throw new TradeError("Esta oferta ya no existe.");
+  const [listing] = await tx
+    .select()
+    .from(listings)
+    .where(eq(listings.id, ref.listingId))
+    .for("update");
   const [neg] = await tx
     .select()
     .from(negotiations)
     .where(eq(negotiations.id, negotiationId))
-    .for("update");
-  if (!neg) throw new TradeError("Esta oferta ya no existe.");
-  const [listing] = await tx
-    .select()
-    .from(listings)
-    .where(eq(listings.id, neg.listingId))
     .for("update");
   const party: Party | null =
     listing.ownerId === userId ? "owner" : neg.offererId === userId ? "offerer" : null;

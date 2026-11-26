@@ -41,14 +41,17 @@ export default async function CollectionLayout({
           <Plus className="size-[18px]" strokeWidth={2.6} />
           Publicar carta
         </Link>
-        <SideNav
-          slug={slug}
-          badge={
-            <Suspense fallback={null}>
-              <TurnBadge slug={slug} variant="pill" />
-            </Suspense>
-          }
-        />
+        {/* usePathname is request data on dynamic routes: stream it in. */}
+        <Suspense fallback={<div className="h-[196px]" />}>
+          <SideNav
+            slug={slug}
+            badge={
+              <Suspense fallback={null}>
+                <TurnBadge slug={slug} variant="pill" />
+              </Suspense>
+            }
+          />
+        </Suspense>
         <div className="mt-auto">
           <Suspense fallback={<div className="h-[60px]" />}>
             <AccountSlot variant="sidebar" />
@@ -58,14 +61,16 @@ export default async function CollectionLayout({
 
       <div className="bg-chart relative flex min-w-0 flex-1 flex-col">{children}</div>
 
-      <BottomNav
-        slug={slug}
-        badge={
-          <Suspense fallback={null}>
-            <TurnBadge slug={slug} variant="dot" />
-          </Suspense>
-        }
-      />
+      <Suspense fallback={null}>
+        <BottomNav
+          slug={slug}
+          badge={
+            <Suspense fallback={null}>
+              <TurnBadge slug={slug} variant="dot" />
+            </Suspense>
+          }
+        />
+      </Suspense>
       <AutoRefresh />
     </div>
   );
