@@ -10,7 +10,8 @@ function createDb() {
   if (!databaseUrl) {
     throw new Error("DATABASE_URL is not set (see .env.example)");
   }
-  // Transaction pooler (port 6543) does not support prepared statements.
+  // Session pooler (5432): the transaction pooler (6543) hangs on the
+  // pipelined queries postgres.js sends. prepare:false keeps either working.
   const client = postgres(databaseUrl, { prepare: false, max: 5 });
   return drizzle(client, { schema, casing: "snake_case" });
 }

@@ -41,7 +41,7 @@ Agreed technical decisions. Product requirements are in [requirements.md](requir
 | `NEXT_PUBLIC_SUPABASE_URL` | Project base URL (without `/rest/v1`) |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_...` — public, for Auth in the browser |
 | `SUPABASE_SECRET_KEY` | `sb_secret_...` — server only (user admin) |
-| `DATABASE_URL` | Transaction pooler, port **6543** — used by the app |
+| `DATABASE_URL` | Session pooler, port **5432** — used by the app (the transaction pooler, 6543, hangs on the pipelined queries postgres.js sends) |
 | `DIRECT_URL` | Session pooler, port **5432** — used by drizzle-kit for migrations |
 
 The direct connection (IPv6) is not used: neither WSL nor the VPS is guaranteed to have IPv6.

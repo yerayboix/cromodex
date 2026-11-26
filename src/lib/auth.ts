@@ -2,6 +2,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { cache } from "react";
 
 import { getDb } from "@/db";
@@ -22,6 +23,9 @@ export type CurrentUser = {
  * behind a <Suspense> boundary (Cache Components).
  */
 export const getCurrentUser = cache(async (): Promise<CurrentUser> => {
+  // Session checks compare token expiry with the clock (Date.now), which
+  // Cache Components rejects during prerender: mark this as request time.
+  await connection();
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub;
