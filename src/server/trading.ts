@@ -7,6 +7,7 @@ import { events, listings, negotiations, proposals, trades } from "@/db/schema";
 import { isValidCardCode, normalizeCardCode } from "@/lib/collections";
 
 import { TradeError } from "./errors";
+import { isUuid } from "./ids";
 
 /*
  * Write side. Each function runs in one transaction, locks the rows it
@@ -88,6 +89,7 @@ export async function publishListings(input: {
 }
 
 export async function withdrawListing(userId: string, listingId: string) {
+  if (!isUuid(listingId)) throw new TradeError("Esta carta ya no está en la mesa.");
   await getDb().transaction(async (tx) => {
     const [listing] = await tx
       .select()
@@ -134,6 +136,7 @@ export async function makeOffer(input: {
   listingId: string;
   cards: string[];
 }) {
+  if (!isUuid(input.listingId)) throw new TradeError("Esta carta ya no está en la mesa.");
   const cards = parseCards(input.slug, input.cards);
   await getDb().transaction(async (tx) => {
     // Locking the listing also serializes alias assignment.
@@ -174,6 +177,7 @@ export async function makeOffer(input: {
  * returns the caller's side.
  */
 async function lockNegotiation(tx: Tx, userId: string, negotiationId: string) {
+  if (!isUuid(negotiationId)) throw new TradeError("Esta oferta ya no existe.");
   const [ref] = await tx
     .select({ listingId: negotiations.listingId })
     .from(negotiations)
@@ -332,6 +336,7 @@ export async function acceptOffer(userId: string, negotiationId: string) {
  * from the viewer's side only.
  */
 export async function previewAccept(userId: string, negotiationId: string) {
+  if (!isUuid(negotiationId)) return null;
   const db = getDb();
   const [neg] = await db
     .select()

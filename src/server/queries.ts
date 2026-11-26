@@ -14,6 +14,8 @@ import {
 } from "@/db/schema";
 import { cardSortIndex } from "@/lib/collections";
 
+import { isUuid } from "./ids";
+
 /*
  * Read side. Every function returns DTOs that never contain another user's
  * id: ownership is reduced to booleans relative to the viewer, and
@@ -124,6 +126,7 @@ export async function getListing(
   collectionId: string,
   viewerId: string,
 ): Promise<ListingView | null> {
+  if (!isUuid(listingId)) return null;
   const db = getDb();
   const [listing] = await db
     .select({
@@ -447,6 +450,7 @@ export async function getTrade(
   collectionId: string,
   viewerId: string,
 ): Promise<TradeView | null> {
+  if (!isUuid(tradeId)) return null;
   const [row] = await tradeSelect()
     .where(and(eq(trades.id, tradeId), eq(listings.collectionId, collectionId)))
     .limit(1);
