@@ -1,0 +1,939 @@
+{
+  "id": "7fa0f818-e01e-43f5-97ef-5e0b9884f5e1",
+  "prevId": "86a85eef-f416-49e2-9bae-8d91458717d4",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "app.cards": {
+      "name": "cards",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "collection_id": {
+          "name": "collection_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cards_collection_id_collections_id_fk": {
+          "name": "cards_collection_id_collections_id_fk",
+          "tableFrom": "cards",
+          "columnsFrom": [
+            "collection_id"
+          ],
+          "tableTo": "collections",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "cards_collection_code_key": {
+          "name": "cards_collection_code_key",
+          "columns": [
+            "collection_id",
+            "code"
+          ],
+          "nullsNotDistinct": false
+        },
+        "cards_collection_sort_key": {
+          "name": "cards_collection_sort_key",
+          "columns": [
+            "collection_id",
+            "sort_order"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "app.collections": {
+      "name": "collections",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "collections_slug_unique": {
+          "name": "collections_slug_unique",
+          "columns": [
+            "slug"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "app.events": {
+      "name": "events",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "dispatched_at": {
+          "name": "dispatched_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "events_pending_idx": {
+          "name": "events_pending_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "where": "\"app\".\"events\".\"dispatched_at\" is null",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "app.listings": {
+      "name": "listings",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "collection_id": {
+          "name": "collection_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "card_code": {
+          "name": "card_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "copies_total": {
+          "name": "copies_total",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "copies_left": {
+          "name": "copies_left",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "listing_status",
+          "typeSchema": "app",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "listings_board_idx": {
+          "name": "listings_board_idx",
+          "columns": [
+            {
+              "expression": "collection_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "listings_one_active_per_card_idx": {
+          "name": "listings_one_active_per_card_idx",
+          "columns": [
+            {
+              "expression": "owner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "collection_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "card_code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "with": {},
+          "method": "btree",
+          "where": "\"app\".\"listings\".\"status\" = 'active'",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "listings_owner_id_profiles_id_fk": {
+          "name": "listings_owner_id_profiles_id_fk",
+          "tableFrom": "listings",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "tableTo": "profiles",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "listings_card_fk": {
+          "name": "listings_card_fk",
+          "tableFrom": "listings",
+          "columnsFrom": [
+            "collection_id",
+            "card_code"
+          ],
+          "tableTo": "cards",
+          "schemaTo": "app",
+          "columnsTo": [
+            "collection_id",
+            "code"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "listings_copies_total_check": {
+          "name": "listings_copies_total_check",
+          "value": "\"app\".\"listings\".\"copies_total\" >= 1"
+        },
+        "listings_copies_left_check": {
+          "name": "listings_copies_left_check",
+          "value": "\"app\".\"listings\".\"copies_left\" between 0 and \"app\".\"listings\".\"copies_total\""
+        }
+      },
+      "isRLSEnabled": true
+    },
+    "app.negotiations": {
+      "name": "negotiations",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "listing_id": {
+          "name": "listing_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "offerer_id": {
+          "name": "offerer_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alias": {
+          "name": "alias",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "negotiation_status",
+          "typeSchema": "app",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'open'"
+        },
+        "turn": {
+          "name": "turn",
+          "type": "party",
+          "typeSchema": "app",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'owner'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "closed_at": {
+          "name": "closed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "negotiations_listing_status_idx": {
+          "name": "negotiations_listing_status_idx",
+          "columns": [
+            {
+              "expression": "listing_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "negotiations_offerer_status_idx": {
+          "name": "negotiations_offerer_status_idx",
+          "columns": [
+            {
+              "expression": "offerer_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "negotiations_listing_id_listings_id_fk": {
+          "name": "negotiations_listing_id_listings_id_fk",
+          "tableFrom": "negotiations",
+          "columnsFrom": [
+            "listing_id"
+          ],
+          "tableTo": "listings",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "negotiations_offerer_id_profiles_id_fk": {
+          "name": "negotiations_offerer_id_profiles_id_fk",
+          "tableFrom": "negotiations",
+          "columnsFrom": [
+            "offerer_id"
+          ],
+          "tableTo": "profiles",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "negotiations_listing_alias_key": {
+          "name": "negotiations_listing_alias_key",
+          "columns": [
+            "listing_id",
+            "alias"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "negotiations_closed_at_check": {
+          "name": "negotiations_closed_at_check",
+          "value": "(\"app\".\"negotiations\".\"status\" = 'open') = (\"app\".\"negotiations\".\"closed_at\" is null)"
+        }
+      },
+      "isRLSEnabled": true
+    },
+    "app.profiles": {
+      "name": "profiles",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "profiles_id_users_id_fk": {
+          "name": "profiles_id_users_id_fk",
+          "tableFrom": "profiles",
+          "columnsFrom": [
+            "id"
+          ],
+          "tableTo": "users",
+          "schemaTo": "auth",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "app.proposal_cards": {
+      "name": "proposal_cards",
+      "schema": "app",
+      "columns": {
+        "proposal_id": {
+          "name": "proposal_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "card_code": {
+          "name": "card_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "proposal_cards_proposal_id_proposals_id_fk": {
+          "name": "proposal_cards_proposal_id_proposals_id_fk",
+          "tableFrom": "proposal_cards",
+          "columnsFrom": [
+            "proposal_id"
+          ],
+          "tableTo": "proposals",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "proposal_cards_proposal_id_card_code_pk": {
+          "name": "proposal_cards_proposal_id_card_code_pk",
+          "columns": [
+            "proposal_id",
+            "card_code"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    },
+    "app.proposals": {
+      "name": "proposals",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "negotiation_id": {
+          "name": "negotiation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "by": {
+          "name": "by",
+          "type": "party",
+          "typeSchema": "app",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seq": {
+          "name": "seq",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "proposals_negotiation_id_negotiations_id_fk": {
+          "name": "proposals_negotiation_id_negotiations_id_fk",
+          "tableFrom": "proposals",
+          "columnsFrom": [
+            "negotiation_id"
+          ],
+          "tableTo": "negotiations",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "proposals_negotiation_seq_key": {
+          "name": "proposals_negotiation_seq_key",
+          "columns": [
+            "negotiation_id",
+            "seq"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "proposals_seq_check": {
+          "name": "proposals_seq_check",
+          "value": "\"app\".\"proposals\".\"seq\" >= 1"
+        }
+      },
+      "isRLSEnabled": true
+    },
+    "app.trades": {
+      "name": "trades",
+      "schema": "app",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "negotiation_id": {
+          "name": "negotiation_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "listing_id": {
+          "name": "listing_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "offerer_id": {
+          "name": "offerer_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "owner_card": {
+          "name": "owner_card",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "offerer_cards": {
+          "name": "offerer_cards",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "accepted_at": {
+          "name": "accepted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "trades_accepted_at_idx": {
+          "name": "trades_accepted_at_idx",
+          "columns": [
+            {
+              "expression": "accepted_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "trades_negotiation_id_negotiations_id_fk": {
+          "name": "trades_negotiation_id_negotiations_id_fk",
+          "tableFrom": "trades",
+          "columnsFrom": [
+            "negotiation_id"
+          ],
+          "tableTo": "negotiations",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "trades_listing_id_listings_id_fk": {
+          "name": "trades_listing_id_listings_id_fk",
+          "tableFrom": "trades",
+          "columnsFrom": [
+            "listing_id"
+          ],
+          "tableTo": "listings",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "trades_owner_id_profiles_id_fk": {
+          "name": "trades_owner_id_profiles_id_fk",
+          "tableFrom": "trades",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "tableTo": "profiles",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
+        "trades_offerer_id_profiles_id_fk": {
+          "name": "trades_offerer_id_profiles_id_fk",
+          "tableFrom": "trades",
+          "columnsFrom": [
+            "offerer_id"
+          ],
+          "tableTo": "profiles",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "trades_negotiationId_unique": {
+          "name": "trades_negotiationId_unique",
+          "columns": [
+            "negotiation_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "trades_offerer_cards_check": {
+          "name": "trades_offerer_cards_check",
+          "value": "cardinality(\"app\".\"trades\".\"offerer_cards\") >= 1"
+        },
+        "trades_distinct_parties_check": {
+          "name": "trades_distinct_parties_check",
+          "value": "\"app\".\"trades\".\"owner_id\" <> \"app\".\"trades\".\"offerer_id\""
+        }
+      },
+      "isRLSEnabled": true
+    },
+    "app.wanted": {
+      "name": "wanted",
+      "schema": "app",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "collection_id": {
+          "name": "collection_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "card_code": {
+          "name": "card_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "wanted_collection_card_idx": {
+          "name": "wanted_collection_card_idx",
+          "columns": [
+            {
+              "expression": "collection_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "card_code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "wanted_user_id_profiles_id_fk": {
+          "name": "wanted_user_id_profiles_id_fk",
+          "tableFrom": "wanted",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "tableTo": "profiles",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "wanted_card_fk": {
+          "name": "wanted_card_fk",
+          "tableFrom": "wanted",
+          "columnsFrom": [
+            "collection_id",
+            "card_code"
+          ],
+          "tableTo": "cards",
+          "schemaTo": "app",
+          "columnsTo": [
+            "collection_id",
+            "code"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "wanted_user_id_collection_id_card_code_pk": {
+          "name": "wanted_user_id_collection_id_card_code_pk",
+          "columns": [
+            "user_id",
+            "collection_id",
+            "card_code"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": true
+    }
+  },
+  "enums": {
+    "app.listing_status": {
+      "name": "listing_status",
+      "schema": "app",
+      "values": [
+        "active",
+        "withdrawn",
+        "exhausted"
+      ]
+    },
+    "app.negotiation_status": {
+      "name": "negotiation_status",
+      "schema": "app",
+      "values": [
+        "open",
+        "accepted",
+        "rejected",
+        "cancelled",
+        "withdrawn"
+      ]
+    },
+    "app.party": {
+      "name": "party",
+      "schema": "app",
+      "values": [
+        "owner",
+        "offerer"
+      ]
+    }
+  },
+  "schemas": {
+    "app": "app"
+  },
+  "views": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

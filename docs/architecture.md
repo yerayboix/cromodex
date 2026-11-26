@@ -84,6 +84,11 @@ Notas:
 - `card_code` se valida contra `cards` de la colección (que el código exista), pero **no** se valida que el usuario posea la carta.
 - `trades` es independiente de `negotiations` para que el registro sea inmutable.
 - Todos los IDs expuestos son **UUID aleatorios** (nunca secuenciales).
+- `listings.card_code` y `wanted.card_code` tienen FK compuesta a `cards (collection_id, code)`. En `proposal_cards` la validación del código se hace en la capa de servidor.
+- Un usuario solo puede tener **una publicación activa por carta** (índice único parcial): si tiene más copias, se suman a la existente.
+- `app.profiles` se rellena con un **trigger sobre `auth.users`**: al crear un usuario en Supabase se crea su perfil con `display_name` = metadato `display_name` o, si no hay, la parte local del email.
+- Los roles `anon` y `authenticated` no tienen `USAGE` sobre el esquema `app`.
+- El seed de la colección es una migración más (`drizzle/0002_seed_rumbo_a_egghead.sql`).
 
 ## 5. Negociación — máquina de estados
 

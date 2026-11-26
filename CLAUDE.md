@@ -21,10 +21,11 @@ Anonymous card-trading board for a closed group of 6 friends (Panini *One Piece 
 ## Status
 
 - Done: repo, conventions, requirements, architecture, Supabase project (Auth configured, connections verified), `.env.local` filled.
-- No Supabase users created yet.
+- No Supabase users created yet (a trigger creates their `app.profiles` row automatically).
+- DB: schema in `src/db/schema.ts`, client in `src/db/index.ts` (server-only). Migrations in `drizzle/`, applied with `npm run db:migrate` (uses `DIRECT_URL`); after changing the schema run `npm run db:generate`. Custom SQL migrations via `npx drizzle-kit generate --custom --name <name>`.
 - Scaffold in 4 steps, one commit each (each step only after the user's go):
   1. ✅ Next.js 16 + TypeScript + Tailwind 4 + shadcn/ui + ESLint, `output: "standalone"`, `.env.example`.
-  2. Drizzle: connection, `app` schema, first migration with all tables + seed of the Rumbo a Egghead collection (1–177, F1–F27).
+  2. ✅ Drizzle: connection, `app` schema, first migration with all tables + seed of the Rumbo a Egghead collection (1–177, F1–F27).
   3. Supabase Auth login (email + password), middleware protecting routes, logout — ask the user to create their account here.
   4. Dockerfile + `docker-compose.yml`, verify the image runs locally.
 
