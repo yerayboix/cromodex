@@ -2,6 +2,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { cache } from "react";
 
 import { getDb } from "@/db";
@@ -19,6 +20,9 @@ export const getCollection = cache(
   async (slug: string): Promise<CollectionContext> => {
     const config = getCollectionConfig(slug);
     if (!config) notFound();
+    // Request-time only: never query the database while prerendering
+    // (the Docker build has no DATABASE_URL).
+    await connection();
     const [row] = await getDb()
       .select({ id: collections.id })
       .from(collections)
