@@ -9,7 +9,7 @@ Anonymous card-trading board for a closed group of 6 friends (Panini *One Piece 
 
 - **Do not build or scaffold anything without an explicit "go" from the user.** Discuss first.
 - Work step by step: one step, one commit, then check in with the user.
-- Talk to the user in Spanish. Code, identifiers and commit messages in English; docs in Spanish.
+- Talk to the user in Spanish. **Everything in the repo is in English** (code, identifiers, comments, docs, commit messages) **except the app's user-facing copy, which is in Spanish.**
 - **Anonymity is the core invariant:** never send another user's `user_id` to the client. All data access is server-side (Drizzle); Supabase is used in the browser **only for Auth**. Do not use Supabase shadcn blocks or `supabase.from()` from the client.
 - Secrets live in `.env.local` (git-ignored). Never print, log or commit their values; validate them without showing them.
 - The user creates Supabase Auth users by hand: tell them when a user is needed.

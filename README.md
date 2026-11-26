@@ -1,12 +1,10 @@
 # cromodex
 
-Control de colecciones de cromos e intercambios entre un grupo reducido de usuarios con acceso por invitación.
+Anonymous sticker-trading board for a small invite-only group of users.
 
-Primera colección: **One Piece — Rumbo a Egghead** (Panini, 204 cromos: 1–177 y F1–F27).
+First collection: **One Piece — Rumbo a Egghead** (Panini, 204 stickers: 1–177 and F1–F27).
 
-## Funcionalidades previstas
+- Product requirements: [docs/requirements.md](docs/requirements.md)
+- Architecture: [docs/architecture.md](docs/architecture.md)
 
-- Colección por usuario: tengo / falta / repes.
-- Cruce automático de intercambios entre usuarios.
-- Propuestas de intercambio (propuesta → aceptada → completada).
-- Fotos de cromos aportadas por los propios usuarios.
+The app UI is in Spanish; code and documentation are in English.
