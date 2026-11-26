@@ -20,6 +20,7 @@ import { previewAccept } from "@/server/trading";
 
 import { NegotiationActions } from "./negotiation-actions";
 import { BackToBoard, CardPanel } from "./panel";
+import { PanelSkeleton } from "./panel-skeleton";
 import { WithdrawListing } from "./withdraw-listing";
 
 export const metadata: Metadata = { title: "Carta" };
@@ -195,13 +196,3 @@ function NegotiationCard({
   );
 }
 
-function PanelSkeleton() {
-  return (
-    <div aria-label="Cargando la carta" className="flex flex-1 flex-col">
-      <div className="flex items-end gap-4 px-5 pt-16 pb-4.5">
-        <div className="h-[158px] w-[112px] animate-pulse rounded-xl bg-parchment/15" />
-      </div>
-      <div className="flex-1 rounded-t-[22px] bg-parchment lg:rounded-none" />
-    </div>
-  );
-}

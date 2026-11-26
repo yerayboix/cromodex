@@ -10,6 +10,7 @@ import { getListing } from "@/server/queries";
 
 import { counterOfferAction } from "@/app/(app)/c/[slug]/actions";
 import { CardComposer } from "../../card-composer";
+import { ComposerSkeleton } from "../../panel-skeleton";
 
 export const metadata: Metadata = { title: "Contraoferta" };
 
@@ -17,7 +18,7 @@ type Props = PageProps<"/c/[slug]/carta/[id]/contraoferta/[negotiationId]">;
 
 export default function CounterPage({ params }: Props) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<ComposerSkeleton />}>
       <Counter params={params} />
     </Suspense>
   );

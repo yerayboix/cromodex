@@ -9,12 +9,13 @@ import { getListing } from "@/server/queries";
 
 import { makeOfferAction } from "@/app/(app)/c/[slug]/actions";
 import { CardComposer } from "../card-composer";
+import { ComposerSkeleton } from "../panel-skeleton";
 
 export const metadata: Metadata = { title: "Hacer una oferta" };
 
 export default function OfferPage({ params }: PageProps<"/c/[slug]/carta/[id]/ofertar">) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<ComposerSkeleton />}>
       <Offer params={params} />
     </Suspense>
   );
