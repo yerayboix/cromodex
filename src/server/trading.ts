@@ -292,7 +292,8 @@ export async function acceptOffer(userId: string, negotiationId: string) {
     );
 
     // The offerer's other open offers in this collection that hand over any
-    // of the codes just given away.
+    // of the codes just given away. No row lock here: closeOpen only updates
+    // rows still open, and the UPDATE takes the lock it needs.
     const theirs = await tx
       .select({ id: negotiations.id })
       .from(negotiations)
@@ -304,8 +305,7 @@ export async function acceptOffer(userId: string, negotiationId: string) {
           ne(negotiations.id, neg.id),
           eq(listings.collectionId, listing.collectionId),
         ),
-      )
-      .for("update", { of: negotiations });
+      );
     const given = new Set(current.cards);
     const conflicting: string[] = [];
     for (const { id } of theirs) {

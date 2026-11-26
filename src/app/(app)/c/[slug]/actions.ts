@@ -1,6 +1,6 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/auth";
@@ -29,6 +29,9 @@ export type ActionState = { error?: string };
 async function attempt(fn: () => Promise<unknown>): Promise<ActionState | null> {
   try {
     await fn();
+    // Re-render the whole collection shell too (turn badge, board beside the
+    // panel): a redirect alone keeps the shared layout from the router cache.
+    revalidatePath("/c/[slug]", "layout");
     return null;
   } catch (e) {
     if (e instanceof TradeError) return { error: e.message };
@@ -143,12 +146,11 @@ export async function addWantedAction(
     addWanted(user.id, collection.id, slug, String(formData.get("code") ?? "")),
   );
   if (failed) return failed;
-  refresh();
   return {};
 }
 
 export async function removeWantedAction(slug: string, code: string): Promise<void> {
   const [user, collection] = await Promise.all([getCurrentUser(), getCollection(slug)]);
   await removeWanted(user.id, collection.id, code);
-  refresh();
+  revalidatePath("/c/[slug]", "layout");
 }
