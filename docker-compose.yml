@@ -1,0 +1,23 @@
+# Run the production image locally:
+#   npm run docker:up      (docker compose --env-file .env.local up --build)
+#
+# --env-file feeds the NEXT_PUBLIC_* build args below; env_file passes the
+# runtime variables into the container. Neither ends up in git.
+services:
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:?set it in .env.local}
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:?set it in .env.local}
+    image: cromodex:local
+    env_file: .env.local
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/login"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped

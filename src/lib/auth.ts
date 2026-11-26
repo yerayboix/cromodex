@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
-import { db } from "@/db";
+import { getDb } from "@/db";
 import { profiles } from "@/db/schema";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -25,7 +25,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser> => {
   const userId = data?.claims?.sub;
   if (!userId) redirect("/login");
 
-  const [profile] = await db
+  const [profile] = await getDb()
     .select({ displayName: profiles.displayName })
     .from(profiles)
     .where(eq(profiles.id, userId))

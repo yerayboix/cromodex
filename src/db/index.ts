@@ -5,23 +5,26 @@ import postgres from "postgres";
 
 import * as schema from "./schema";
 
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is not set (see .env.example)");
+function createDb() {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is not set (see .env.example)");
+  }
+  // Transaction pooler (port 6543) does not support prepared statements.
+  const client = postgres(databaseUrl, { prepare: false, max: 5 });
+  return drizzle(client, { schema, casing: "snake_case" });
 }
 
-// Reuse the client across hot reloads in development.
-const globalForDb = globalThis as unknown as {
-  pgClient?: ReturnType<typeof postgres>;
-};
+export type Db = ReturnType<typeof createDb>;
 
-// Transaction pooler (port 6543) does not support prepared statements.
-const client =
-  globalForDb.pgClient ?? postgres(databaseUrl, { prepare: false, max: 5 });
+// Reuse the instance across hot reloads in development.
+const globalForDb = globalThis as unknown as { db?: Db };
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.pgClient = client;
+/**
+ * Lazily created so that importing this module never needs DATABASE_URL
+ * (e.g. during `next build` in Docker, where it is only a runtime variable).
+ */
+export function getDb(): Db {
+  if (!globalForDb.db) globalForDb.db = createDb();
+  return globalForDb.db;
 }
-
-export const db = drizzle(client, { schema, casing: "snake_case" });
-export type Db = typeof db;
