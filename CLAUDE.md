@@ -21,13 +21,14 @@ Anonymous card-trading board for a closed group of 6 friends (Panini *One Piece 
 ## Status
 
 - Done: repo, conventions, requirements, architecture, Supabase project (Auth configured, connections verified), `.env.local` filled.
-- No Supabase users created yet (a trigger creates their `app.profiles` row automatically).
+- Supabase users: the admin's own account exists. A trigger creates each user's `app.profiles` row automatically.
+- Auth: `src/proxy.ts` (Next 16 replacement for middleware) refreshes the session and gates routes; login/logout are Server Actions (no Supabase client in the browser at all). `getCurrentUser()` in `src/lib/auth.ts` is the DAL entry point; reading it requires a `<Suspense>` boundary (Cache Components). Signed-in pages live in the `src/app/(app)` route group.
 - DB: schema in `src/db/schema.ts`, client in `src/db/index.ts` (server-only). Migrations in `drizzle/`, applied with `npm run db:migrate` (uses `DIRECT_URL`); after changing the schema run `npm run db:generate`. Custom SQL migrations via `npx drizzle-kit generate --custom --name <name>`.
 - Card codes per collection live in `src/lib/collections.ts` (pure module, used for validation on client and server). One listing = one copy.
 - Scaffold in 4 steps, one commit each (each step only after the user's go):
   1. ✅ Next.js 16 + TypeScript + Tailwind 4 + shadcn/ui + ESLint, `output: "standalone"`, `.env.example`.
   2. ✅ Drizzle: connection, `app` schema, first migration with all tables + seed of the Rumbo a Egghead collection (1–177, F1–F27).
-  3. Supabase Auth login (email + password), middleware protecting routes, logout — ask the user to create their account here.
+  3. ✅ Supabase Auth login (email + password), proxy protecting routes, logout.
   4. Dockerfile + `docker-compose.yml`, verify the image runs locally.
 
 ## Commit messages

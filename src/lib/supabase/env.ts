@@ -1,0 +1,11 @@
+/** Public Supabase settings (safe in both server and proxy code). */
+export function supabaseEnv(): { url: string; publishableKey: string } {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !publishableKey) {
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are not set (see .env.example)",
+    );
+  }
+  return { url, publishableKey };
+}
