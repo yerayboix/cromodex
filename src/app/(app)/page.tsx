@@ -1,19 +1,9 @@
-import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
-import { getCurrentUser } from "@/lib/auth";
+import { DEFAULT_COLLECTION } from "@/lib/collections";
+import { paths } from "@/lib/paths";
 
+/** The app opens on the default collection's board. */
 export default function HomePage() {
-  return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
-      <Suspense fallback={<h1 className="text-2xl font-semibold">Hola</h1>}>
-        <Greeting />
-      </Suspense>
-      <p className="text-muted-foreground">Aquí irá el tablón de intercambios.</p>
-    </main>
-  );
-}
-
-async function Greeting() {
-  const user = await getCurrentUser();
-  return <h1 className="text-2xl font-semibold">Hola, {user.displayName}</h1>;
+  redirect(paths.board(DEFAULT_COLLECTION));
 }

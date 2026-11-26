@@ -5,6 +5,29 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Collection theme tokens (values live in the [data-theme] blocks below). */
+  --color-table: var(--theme-table);
+  --color-table-deep: var(--theme-table-deep);
+  --color-nav: var(--theme-nav);
+  --color-parchment: var(--theme-parchment);
+  --color-ink: var(--theme-ink);
+  --color-turn: var(--theme-turn);
+  --color-gold: var(--theme-gold);
+  --color-gold-shadow: var(--theme-gold-shadow);
+  --color-danger: var(--theme-danger);
+  --color-danger-ink: var(--theme-danger-ink);
+  --color-danger-soft: var(--theme-danger-soft);
+  --color-muted-table: var(--theme-muted-table);
+  --color-muted-ink: var(--theme-muted-ink);
+  --color-panel: var(--theme-panel);
+  --color-panel-2: var(--theme-panel-2);
+  --color-line: var(--theme-line);
+  --color-field: var(--theme-field);
+  --color-outline: var(--theme-outline);
+  --color-ok: var(--theme-ok);
+  --color-wood: var(--theme-wood);
+  --font-display: var(--theme-font-display);
+  --font-body: var(--theme-font-body);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -126,5 +149,82 @@
   }
   html {
     @apply font-sans;
+  }
+}
+/* ---------------------------------------------------------------------
+ * Collection themes. The default (:root) is the One Piece theme so pages
+ * outside a collection (login) still look like the app. A new collection
+ * theme adds another [data-theme] block with the same variables.
+ * ------------------------------------------------------------------ */
+:root,
+[data-theme="one-piece"] {
+  --theme-table: #0d3b54;
+  --theme-table-deep: #0a3149;
+  --theme-nav: #082a3d;
+  --theme-parchment: #f5ead3;
+  --theme-ink: #2a1f14;
+  --theme-turn: #c8102e;
+  --theme-gold: #f4c542;
+  --theme-gold-shadow: #c9a23a;
+  --theme-danger: #a50d25;
+  --theme-danger-ink: #7a0a1c;
+  --theme-danger-soft: #fbe3e1;
+  --theme-muted-table: #a9c6d6;
+  --theme-muted-ink: #6a5844;
+  --theme-panel: #fff8ea;
+  --theme-panel-2: #eadbb8;
+  --theme-line: #d8c49c;
+  --theme-field: #c9b68e;
+  --theme-outline: #6f95aa;
+  --theme-ok: #2c6e5a;
+  --theme-wood: #6b4226;
+  --theme-frame: linear-gradient(180deg, #7a4b2a 0%, #5c371d 100%);
+  --theme-frame-special: linear-gradient(135deg, #b87414 0%, #f7de8a 45%, #c98a1e 70%, #fbe9a6 100%);
+  --theme-grid-line: rgb(245 234 211 / 0.06);
+  --theme-font-display: var(--font-alfa-slab), serif;
+  --theme-font-body: var(--font-archivo), system-ui, sans-serif;
+}
+
+/* Nautical chart grid over the table colour. */
+@utility bg-chart {
+  background-color: var(--theme-table);
+  background-image:
+    repeating-linear-gradient(0deg, var(--theme-grid-line) 0 1px, transparent 1px 46px),
+    repeating-linear-gradient(90deg, var(--theme-grid-line) 0 1px, transparent 1px 46px);
+}
+
+@utility bg-chart-fine {
+  background-color: var(--theme-table-deep);
+  background-image:
+    repeating-linear-gradient(0deg, rgb(245 234 211 / 0.07) 0 1px, transparent 1px 30px),
+    repeating-linear-gradient(90deg, rgb(245 234 211 / 0.07) 0 1px, transparent 1px 30px);
+}
+
+@utility frame-regular {
+  background: var(--theme-frame);
+}
+
+@utility frame-special {
+  background: var(--theme-frame-special);
+}
+
+/* Lined paper behind a card that has no photo. */
+@utility bg-card-blank {
+  background-color: var(--theme-panel-2);
+  background-image: repeating-linear-gradient(0deg, rgb(107 66 38 / 0.12) 0 1px, transparent 1px 14px);
+}
+
+@utility shadow-card {
+  box-shadow: 0 3px 0 rgb(4 22 33 / 0.6);
+}
+
+@layer base {
+  :where(a, button, input, [tabindex]):focus-visible {
+    outline: 3px solid var(--theme-gold);
+    outline-offset: 2px;
+  }
+
+  dialog::backdrop {
+    background: rgb(4 22 33 / 0.62);
   }
 }
