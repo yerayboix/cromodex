@@ -12,6 +12,8 @@ export type CurrentUser = {
   /** Never send this to the client; it is for server-side queries only. */
   id: string;
   displayName: string;
+  /** The signed-in user's own email (only ever shown to themselves). */
+  email: string;
 };
 
 /**
@@ -23,6 +25,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser> => {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase.auth.getClaims();
   const userId = data?.claims?.sub;
+  const email = typeof data?.claims?.email === "string" ? data.claims.email : "";
   if (!userId) redirect("/login");
 
   const [profile] = await getDb()
@@ -35,5 +38,5 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser> => {
   // fail loudly instead of redirecting (the proxy would bounce back).
   if (!profile) throw new Error("Signed-in user has no profile");
 
-  return { id: userId, displayName: profile.displayName };
+  return { id: userId, displayName: profile.displayName, email };
 });
