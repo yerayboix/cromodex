@@ -16,7 +16,6 @@ Anonymous card-trading board for a closed group of 6 friends (Panini *One Piece 
 - Development happens in WSL (`~/projects/cromodex`); Node via nvm, Docker Engine inside WSL.
 - UI library: **shadcn/ui** on Tailwind (style `base-nova`, base color `neutral`, lucide icons).
 - Next.js 16 has breaking changes vs. older versions: see [AGENTS.md](AGENTS.md) and read `node_modules/next/dist/docs/` before writing Next code.
-- Design pass (frontend-design skill) happens after the scaffold, before building the first real screen (the board).
 
 ## Status
 
@@ -30,7 +29,10 @@ Anonymous card-trading board for a closed group of 6 friends (Panini *One Piece 
   2. ✅ Drizzle: connection, `app` schema, first migration with all tables + seed of the Rumbo a Egghead collection (1–177, F1–F27).
   3. ✅ Supabase Auth login (email + password), proxy protecting routes, logout.
   4. ✅ Dockerfile + `docker-compose.yml`, image verified locally (`npm run docker:up` / `docker:down`).
-- Next step: design pass with the frontend-design skill (visual direction + mobile mockups of board, negotiation and trade log), then build features.
+- Design: theme C (One Piece) for phone and desktop, in the private design canvas artifact. Each collection picks a theme via `theme` in `src/lib/collections.ts` and a `[data-theme]` block in `globals.css`.
+- UI built: board with filters, card panel (offers by alias, offer/counter composer, accept/reject/leave dialogs), publish, withdraw, Mis tratos, Buscadas, Registro, account (display name, logout). Routes live under `/c/[slug]` (see `src/lib/paths.ts`). Reads in `src/server/queries.ts` (viewer-relative DTOs), writes in `src/server/trading.ts` (one transaction each, outbox events).
+- Out of scope still: card photos (the layout leaves room), notifications.
+- Next step: end-to-end test with real users, then fixes.
 
 ## Commit messages
 
