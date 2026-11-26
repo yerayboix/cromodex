@@ -49,13 +49,11 @@ La conexión directa (IPv6) no se usa: WSL y el VPS no tienen IPv6 garantizado.
 ## 4. Modelo de datos (esquema `app`)
 
 ```
-collections      (id uuid, slug, name)
-cards            (id uuid, collection_id, code, sort_order)          -- 1..177, F1..F27
+collections      (id uuid, slug, name)        -- códigos de carta en src/lib/collections.ts
 profiles         (id uuid = auth.users.id, display_name)
 
-listings         (id uuid, collection_id, owner_id, card_code,
-                  copies_total, copies_left,
-                  status: active | withdrawn | exhausted,
+listings         (id uuid, collection_id, owner_id, card_code,       -- 1 listing = 1 copia
+                  status: active | withdrawn | traded,
                   created_at)
 
 negotiations     (id uuid, listing_id, offerer_id,
@@ -64,10 +62,11 @@ negotiations     (id uuid, listing_id, offerer_id,
                   turn: owner | offerer,
                   created_at, closed_at)
 
-proposals        (id uuid, negotiation_id, by: owner | offerer, seq, created_at)
-proposal_cards   (proposal_id, card_code)                             -- cartas que da el ofertante
+proposals        (id uuid, negotiation_id, by: owner | offerer, seq,
+                  cards text[],                                       -- lo que da el ofertante (admite repetidos)
+                  created_at)
 
-trades           (id uuid, negotiation_id, listing_id,
+trades           (id uuid, negotiation_id, listing_id (único),
                   owner_id, offerer_id,
                   owner_card, offerer_cards text[],
                   accepted_at)                                        -- registro público, inmutable
@@ -81,14 +80,13 @@ Notas:
 
 - El autor siempre entrega **una copia de `listings.card_code`**; ese lado no se negocia. Las propuestas solo contienen lo que da el ofertante.
 - La **propuesta vigente** es la de mayor `seq`.
-- `card_code` se valida contra `cards` de la colección (que el código exista), pero **no** se valida que el usuario posea la carta.
+- **Una publicación es una copia**: publicar N copias crea N `listings` independientes. Cada una se intercambia como mucho una vez (`trades.listing_id` único).
+- Los **códigos de carta** de cada colección están en `src/lib/collections.ts` (no hay tabla `cards`). Es un módulo puro: el cliente lo usa para validar al escribir y el servidor reutiliza el mismo validador antes de insertar. **No** se valida que el usuario posea la carta.
 - `trades` es independiente de `negotiations` para que el registro sea inmutable.
 - Todos los IDs expuestos son **UUID aleatorios** (nunca secuenciales).
-- `listings.card_code` y `wanted.card_code` tienen FK compuesta a `cards (collection_id, code)`. En `proposal_cards` la validación del código se hace en la capa de servidor.
-- Un usuario solo puede tener **una publicación activa por carta** (índice único parcial): si tiene más copias, se suman a la existente.
 - `app.profiles` se rellena con un **trigger sobre `auth.users`**: al crear un usuario en Supabase se crea su perfil con `display_name` = metadato `display_name` o, si no hay, la parte local del email.
 - Los roles `anon` y `authenticated` no tienen `USAGE` sobre el esquema `app`.
-- El seed de la colección es una migración más (`drizzle/0002_seed_rumbo_a_egghead.sql`).
+- El seed de la colección (solo la fila de `collections`) es una migración más (`drizzle/0002_seed_rumbo_a_egghead.sql`).
 
 ## 5. Negociación — máquina de estados
 
@@ -101,7 +99,7 @@ Notas:
      accept   (quien tiene turno) ─► ACCEPTED   → crea trade, revela nombres
      reject   (quien tiene turno) ─► REJECTED   → desaparece
      withdraw (cualquiera, si OPEN) ► WITHDRAWN → desaparece
-     conflicto / listing retirado o agotado ─► CANCELLED → desaparece
+     conflicto / listing retirado o intercambiado ─► CANCELLED → desaparece
 ```
 
 - El autor no puede ofertar sobre su propia publicación.
@@ -112,18 +110,18 @@ Notas:
 ```
 BEGIN
   SELECT negotiation … FOR UPDATE      -- status = open y el turno es de quien acepta
-  SELECT listing … FOR UPDATE          -- status = active y copies_left > 0
+  SELECT listing … FOR UPDATE          -- status = active
   INSERT trade (owner_id, offerer_id, owner_card, offerer_cards)
   UPDATE negotiation → accepted
-  UPDATE listing copies_left - 1
-     → si llega a 0: status = exhausted y cancelar sus negociaciones abiertas
+  UPDATE listing → traded
+  CANCELAR las demás negociaciones OPEN de ese listing
   CANCELAR negociaciones OPEN del MISMO offerer cuya propuesta vigente
      contenga alguno de los códigos entregados en este trato
   INSERT events (trade.accepted, negotiation.cancelled × N)
 COMMIT
 ```
 
-- Dos aceptaciones simultáneas sobre la última copia: el `FOR UPDATE` serializa; la segunda ve `copies_left = 0` y falla limpiamente.
+- Dos aceptaciones simultáneas sobre el mismo listing: el `FOR UPDATE` serializa; la segunda ve `status = traded` y falla limpiamente (y `trades.listing_id` único lo garantiza también en la BD).
 - La UI muestra antes el aviso: **"ESTA ACCIÓN NO SE PUEDE DESHACER. Al aceptar se revelará públicamente quiénes participan en el intercambio."**
 
 ## 7. Anonimato — cómo se aplica

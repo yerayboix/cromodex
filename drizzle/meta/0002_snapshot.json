@@ -1,79 +1,9 @@
 {
-  "id": "7fa0f818-e01e-43f5-97ef-5e0b9884f5e1",
-  "prevId": "86a85eef-f416-49e2-9bae-8d91458717d4",
+  "id": "ab29f7ad-2330-4465-9448-12bb37c32ef1",
+  "prevId": "de57ef83-5b32-4f95-9653-02599a0c96bc",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "app.cards": {
-      "name": "cards",
-      "schema": "app",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "collection_id": {
-          "name": "collection_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "code": {
-          "name": "code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sort_order": {
-          "name": "sort_order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "cards_collection_id_collections_id_fk": {
-          "name": "cards_collection_id_collections_id_fk",
-          "tableFrom": "cards",
-          "columnsFrom": [
-            "collection_id"
-          ],
-          "tableTo": "collections",
-          "schemaTo": "app",
-          "columnsTo": [
-            "id"
-          ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "cards_collection_code_key": {
-          "name": "cards_collection_code_key",
-          "columns": [
-            "collection_id",
-            "code"
-          ],
-          "nullsNotDistinct": false
-        },
-        "cards_collection_sort_key": {
-          "name": "cards_collection_sort_key",
-          "columns": [
-            "collection_id",
-            "sort_order"
-          ],
-          "nullsNotDistinct": false
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": true
-    },
     "app.collections": {
       "name": "collections",
       "schema": "app",
@@ -205,18 +135,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "copies_total": {
-          "name": "copies_total",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "copies_left": {
-          "name": "copies_left",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
         "status": {
           "name": "status",
           "type": "listing_status",
@@ -254,37 +172,23 @@
           "with": {},
           "method": "btree",
           "concurrently": false
-        },
-        "listings_one_active_per_card_idx": {
-          "name": "listings_one_active_per_card_idx",
-          "columns": [
-            {
-              "expression": "owner_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "collection_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "card_code",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "with": {},
-          "method": "btree",
-          "where": "\"app\".\"listings\".\"status\" = 'active'",
-          "concurrently": false
         }
       },
       "foreignKeys": {
+        "listings_collection_id_collections_id_fk": {
+          "name": "listings_collection_id_collections_id_fk",
+          "tableFrom": "listings",
+          "columnsFrom": [
+            "collection_id"
+          ],
+          "tableTo": "collections",
+          "schemaTo": "app",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        },
         "listings_owner_id_profiles_id_fk": {
           "name": "listings_owner_id_profiles_id_fk",
           "tableFrom": "listings",
@@ -298,37 +202,12 @@
           ],
           "onUpdate": "no action",
           "onDelete": "no action"
-        },
-        "listings_card_fk": {
-          "name": "listings_card_fk",
-          "tableFrom": "listings",
-          "columnsFrom": [
-            "collection_id",
-            "card_code"
-          ],
-          "tableTo": "cards",
-          "schemaTo": "app",
-          "columnsTo": [
-            "collection_id",
-            "code"
-          ],
-          "onUpdate": "no action",
-          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {
-        "listings_copies_total_check": {
-          "name": "listings_copies_total_check",
-          "value": "\"app\".\"listings\".\"copies_total\" >= 1"
-        },
-        "listings_copies_left_check": {
-          "name": "listings_copies_left_check",
-          "value": "\"app\".\"listings\".\"copies_left\" between 0 and \"app\".\"listings\".\"copies_total\""
-        }
-      },
+      "checkConstraints": {},
       "isRLSEnabled": true
     },
     "app.negotiations": {
@@ -524,54 +403,6 @@
       "checkConstraints": {},
       "isRLSEnabled": true
     },
-    "app.proposal_cards": {
-      "name": "proposal_cards",
-      "schema": "app",
-      "columns": {
-        "proposal_id": {
-          "name": "proposal_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "card_code": {
-          "name": "card_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "proposal_cards_proposal_id_proposals_id_fk": {
-          "name": "proposal_cards_proposal_id_proposals_id_fk",
-          "tableFrom": "proposal_cards",
-          "columnsFrom": [
-            "proposal_id"
-          ],
-          "tableTo": "proposals",
-          "schemaTo": "app",
-          "columnsTo": [
-            "id"
-          ],
-          "onUpdate": "no action",
-          "onDelete": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "proposal_cards_proposal_id_card_code_pk": {
-          "name": "proposal_cards_proposal_id_card_code_pk",
-          "columns": [
-            "proposal_id",
-            "card_code"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": true
-    },
     "app.proposals": {
       "name": "proposals",
       "schema": "app",
@@ -599,6 +430,12 @@
         "seq": {
           "name": "seq",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cards": {
+          "name": "cards",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": true
         },
@@ -643,6 +480,10 @@
         "proposals_seq_check": {
           "name": "proposals_seq_check",
           "value": "\"app\".\"proposals\".\"seq\" >= 1"
+        },
+        "proposals_cards_check": {
+          "name": "proposals_cards_check",
+          "value": "cardinality(\"app\".\"proposals\".\"cards\") >= 1"
         }
       },
       "isRLSEnabled": true
@@ -785,6 +626,13 @@
             "negotiation_id"
           ],
           "nullsNotDistinct": false
+        },
+        "trades_listingId_unique": {
+          "name": "trades_listingId_unique",
+          "columns": [
+            "listing_id"
+          ],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -861,18 +709,16 @@
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
-        "wanted_card_fk": {
-          "name": "wanted_card_fk",
+        "wanted_collection_id_collections_id_fk": {
+          "name": "wanted_collection_id_collections_id_fk",
           "tableFrom": "wanted",
           "columnsFrom": [
-            "collection_id",
-            "card_code"
+            "collection_id"
           ],
-          "tableTo": "cards",
+          "tableTo": "collections",
           "schemaTo": "app",
           "columnsTo": [
-            "collection_id",
-            "code"
+            "id"
           ],
           "onUpdate": "no action",
           "onDelete": "no action"
@@ -901,7 +747,7 @@
       "values": [
         "active",
         "withdrawn",
-        "exhausted"
+        "traded"
       ]
     },
     "app.negotiation_status": {

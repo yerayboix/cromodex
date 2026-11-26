@@ -13,13 +13,14 @@ Tablón de intercambio de cromos **anónimo** entre un grupo cerrado de usuarios
 
 - Todo pertenece a una **colección**. Por ahora solo existe *One Piece — Rumbo a Egghead* (Panini): cromos `1`–`177` y `F1`–`F27`.
 - El modelo debe permitir añadir colecciones en el futuro sin cambios estructurales.
+- La lista de códigos válidos de cada colección está **definida en el código** de la app (es oficial y fija); al escribir un código se valida contra ella.
 
 ## 3. Publicaciones (tablón)
 
-- Un usuario publica un **código de carta** y un **número de copias** disponibles.
-- Cada copia permite cerrar **un trato independiente**: una publicación con 3 copias admite hasta 3 intercambios aceptados.
+- Un usuario publica un **código de carta** indicando cuántas copias tiene.
+- **Cada copia es una publicación independiente**, con su propio ciclo de vida: publicar 3 copias crea 3 publicaciones que se negocian, aceptan o retiran por separado.
 - El tablón muestra todas las publicaciones activas de la colección, **sin autor visible**.
-- Cuando todas las copias se han intercambiado, la publicación **desaparece** del tablón.
+- Cuando se acepta un trato sobre una publicación, esta **desaparece** del tablón.
 - El autor puede **retirar** su publicación en cualquier momento; las negociaciones abiertas sobre ella se cancelan.
 
 ## 4. Negociaciones
@@ -32,6 +33,7 @@ Tablón de intercambio de cromos **anónimo** entre un grupo cerrado de usuarios
   - Quien recibe la última propuesta puede **aceptarla**, **contraofertar** o **rechazar** la negociación entera.
 - **Solo códigos**: no hay chat ni texto libre.
 - **No se valida** que el ofertante tenga las cartas que ofrece.
+- Una oferta **puede repetir códigos** (p. ej. *45 + 45*); queda a criterio de quien la recibe.
 - Puede haber **varias negociaciones abiertas** sobre la misma publicación.
 - **Todas las negociaciones son visibles para todos** (para poder mejorar ofertas), pero son **irrastreables**:
   - Cada negociación tiene un **alias propio** (p. ej. *Oferta A*, *Oferta B*), único dentro de esa publicación.
@@ -45,7 +47,7 @@ Tablón de intercambio de cromos **anónimo** entre un grupo cerrado de usuarios
   > **ESTA ACCIÓN NO SE PUEDE DESHACER.** Al aceptar se revelará públicamente quiénes participan en el intercambio.
 - Al aceptar:
   1. El intercambio queda **cerrado y es definitivo**.
-  2. Se descuenta una copia de la publicación (y desaparece si llega a 0).
+  2. La publicación queda **intercambiada** y desaparece del tablón; sus demás negociaciones abiertas se cancelan.
   3. **Cancelación de ofertas en conflicto:** se cancelan automáticamente las demás negociaciones abiertas en las que **el ofertante del trato aceptado** esté ofreciendo **alguno de los códigos** que acaba de entregar.
   4. Se registra el intercambio con los nombres de ambos participantes.
 

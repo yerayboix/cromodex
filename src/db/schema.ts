@@ -1,7 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
   check,
-  foreignKey,
   index,
   integer,
   jsonb,
@@ -10,7 +9,6 @@ import {
   text,
   timestamp,
   unique,
-  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { authUsers } from "drizzle-orm/supabase";
@@ -27,7 +25,7 @@ export const app = pgSchema("app");
 export const listingStatus = app.enum("listing_status", [
   "active",
   "withdrawn",
-  "exhausted",
+  "traded",
 ]);
 
 export const negotiationStatus = app.enum("negotiation_status", [
@@ -46,31 +44,16 @@ const createdAt = () =>
 
 // ---------------------------------------------------------- collections
 
+/**
+ * The list of valid card codes per collection lives in code
+ * (src/lib/collections.ts), keyed by `slug`, not in the database.
+ */
 export const collections = app
   .table("collections", {
     id: uuid().primaryKey().defaultRandom(),
     slug: text().notNull().unique(),
     name: text().notNull(),
   })
-  .enableRLS();
-
-export const cards = app
-  .table(
-    "cards",
-    {
-      id: uuid().primaryKey().defaultRandom(),
-      collectionId: uuid()
-        .notNull()
-        .references(() => collections.id, { onDelete: "cascade" }),
-      code: text().notNull(),
-      sortOrder: integer().notNull(),
-    },
-    (t) => [
-      // Target for the composite FKs that validate card codes.
-      unique("cards_collection_code_key").on(t.collectionId, t.code),
-      unique("cards_collection_sort_key").on(t.collectionId, t.sortOrder),
-    ],
-  )
   .enableRLS();
 
 // ------------------------------------------------------------- profiles
@@ -86,38 +69,26 @@ export const profiles = app
 
 // ------------------------------------------------------------- listings
 
+/**
+ * One listing = one physical copy, with its own lifecycle. Publishing
+ * 3 copies of a card creates 3 independent listings.
+ */
 export const listings = app
   .table(
     "listings",
     {
       id: uuid().primaryKey().defaultRandom(),
-      collectionId: uuid().notNull(),
+      collectionId: uuid()
+        .notNull()
+        .references(() => collections.id),
       ownerId: uuid()
         .notNull()
         .references(() => profiles.id),
       cardCode: text().notNull(),
-      copiesTotal: integer().notNull(),
-      copiesLeft: integer().notNull(),
       status: listingStatus().notNull().default("active"),
       createdAt: createdAt(),
     },
-    (t) => [
-      foreignKey({
-        name: "listings_card_fk",
-        columns: [t.collectionId, t.cardCode],
-        foreignColumns: [cards.collectionId, cards.code],
-      }),
-      check("listings_copies_total_check", sql`${t.copiesTotal} >= 1`),
-      check(
-        "listings_copies_left_check",
-        sql`${t.copiesLeft} between 0 and ${t.copiesTotal}`,
-      ),
-      index("listings_board_idx").on(t.collectionId, t.status),
-      // One active listing per user and card: add copies instead.
-      uniqueIndex("listings_one_active_per_card_idx")
-        .on(t.ownerId, t.collectionId, t.cardCode)
-        .where(sql`${t.status} = 'active'`),
-    ],
+    (t) => [index("listings_board_idx").on(t.collectionId, t.status)],
   )
   .enableRLS();
 
@@ -154,7 +125,10 @@ export const negotiations = app
   )
   .enableRLS();
 
-/** One turn of a negotiation. The current proposal is the highest `seq`. */
+/**
+ * One turn of a negotiation. The current proposal is the highest `seq`.
+ * `cards` are the codes the offerer gives (repeats allowed).
+ */
 export const proposals = app
   .table(
     "proposals",
@@ -165,29 +139,14 @@ export const proposals = app
         .references(() => negotiations.id, { onDelete: "cascade" }),
       by: party().notNull(),
       seq: integer().notNull(),
+      cards: text().array().notNull(),
       createdAt: createdAt(),
     },
     (t) => [
       unique("proposals_negotiation_seq_key").on(t.negotiationId, t.seq),
       check("proposals_seq_check", sql`${t.seq} >= 1`),
+      check("proposals_cards_check", sql`cardinality(${t.cards}) >= 1`),
     ],
-  )
-  .enableRLS();
-
-/**
- * Cards the offerer gives in a proposal. Codes are validated against the
- * listing's collection in the server layer (no direct collection_id here).
- */
-export const proposalCards = app
-  .table(
-    "proposal_cards",
-    {
-      proposalId: uuid()
-        .notNull()
-        .references(() => proposals.id, { onDelete: "cascade" }),
-      cardCode: text().notNull(),
-    },
-    (t) => [primaryKey({ columns: [t.proposalId, t.cardCode] })],
   )
   .enableRLS();
 
@@ -203,8 +162,10 @@ export const trades = app
         .notNull()
         .unique()
         .references(() => negotiations.id),
+      // A listing is one copy, so it can be traded only once.
       listingId: uuid()
         .notNull()
+        .unique()
         .references(() => listings.id),
       ownerId: uuid()
         .notNull()
@@ -236,16 +197,13 @@ export const wanted = app
       userId: uuid()
         .notNull()
         .references(() => profiles.id, { onDelete: "cascade" }),
-      collectionId: uuid().notNull(),
+      collectionId: uuid()
+        .notNull()
+        .references(() => collections.id),
       cardCode: text().notNull(),
     },
     (t) => [
       primaryKey({ columns: [t.userId, t.collectionId, t.cardCode] }),
-      foreignKey({
-        name: "wanted_card_fk",
-        columns: [t.collectionId, t.cardCode],
-        foreignColumns: [cards.collectionId, cards.code],
-      }),
       index("wanted_collection_card_idx").on(t.collectionId, t.cardCode),
     ],
   )
