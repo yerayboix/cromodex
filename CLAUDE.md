@@ -14,14 +14,16 @@ Anonymous card-trading board for a closed group of 6 friends (Panini *One Piece 
 - Secrets live in `.env.local` (git-ignored). Never print, log or commit their values; validate them without showing them.
 - The user creates Supabase Auth users by hand: tell them when a user is needed.
 - Development happens in WSL (`~/projects/cromodex`); Node via nvm, Docker Engine inside WSL.
-- UI library: **shadcn/ui** on Tailwind.
+- UI library: **shadcn/ui** on Tailwind (style `base-nova`, base color `neutral`, lucide icons).
+- Next.js 16 has breaking changes vs. older versions: see [AGENTS.md](AGENTS.md) and read `node_modules/next/dist/docs/` before writing Next code.
+- Design pass (frontend-design skill) happens after the scaffold, before building the first real screen (the board).
 
 ## Status
 
 - Done: repo, conventions, requirements, architecture, Supabase project (Auth configured, connections verified), `.env.local` filled.
-- No app code yet. No Supabase users created yet.
-- Next step (only after the user's go): scaffold in 4 steps, one commit each:
-  1. Next.js + TypeScript + Tailwind + shadcn/ui + ESLint, `output: "standalone"`, `.env.example`.
+- No Supabase users created yet.
+- Scaffold in 4 steps, one commit each (each step only after the user's go):
+  1. ✅ Next.js 16 + TypeScript + Tailwind 4 + shadcn/ui + ESLint, `output: "standalone"`, `.env.example`.
   2. Drizzle: connection, `app` schema, first migration with all tables + seed of the Rumbo a Egghead collection (1–177, F1–F27).
   3. Supabase Auth login (email + password), middleware protecting routes, logout — ask the user to create their account here.
   4. Dockerfile + `docker-compose.yml`, verify the image runs locally.

@@ -29,3 +29,12 @@ Thumbs.db
 # supabase local
 supabase/.temp/
 supabase/.branches/
+
+# next.js
+/out/
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+*.pem
+.pnp
+.pnp.*
