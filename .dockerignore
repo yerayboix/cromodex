@@ -18,3 +18,10 @@ drizzle.config.ts
 Dockerfile
 docker-compose.yml
 .dockerignore
+
+# Local-only tooling: Supabase stack, test scripts, agent docs.
+supabase
+scripts
+CLAUDE.md
+AGENTS.md
+README.md

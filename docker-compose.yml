@@ -14,10 +14,4 @@ services:
     env_file: .env.local
     ports:
       - "3000:3000"
-    healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/login"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
     restart: unless-stopped

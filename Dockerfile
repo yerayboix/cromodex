@@ -43,5 +43,11 @@ COPY --from=build --chown=nextjs:nodejs /app/public ./public
 USER nextjs
 EXPOSE 3000
 
-# Runtime secrets (DATABASE_URL, SUPABASE_SECRET_KEY) come from env vars.
+# Used by Docker and Dokploy (Swarm) to tell when the app is ready. /login
+# is public and does not touch the database.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD wget -q --spider "http://127.0.0.1:${PORT}/login" || exit 1
+
+# Runtime config comes from env vars: DATABASE_URL (secret) and the two
+# NEXT_PUBLIC_* values. SUPABASE_SECRET_KEY is not used by the app.
 CMD ["node", "server.js"]
