@@ -146,6 +146,8 @@ COMMIT
 
 ## 10. Deploy
 
+Step by step: [deploy.md](deploy.md).
+
 - `next.config` with `output: "standalone"`; **multi-stage Dockerfile** (deps → build → runner with `node server.js`).
 - `NEXT_PUBLIC_*` variables as **build args** in Dokploy (they are inlined at build time) in addition to env vars.
 - **Migrations** (drizzle-kit) as a separate step, not on container start.

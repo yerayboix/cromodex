@@ -33,7 +33,8 @@ Anonymous card-trading board for a closed group of 6 friends (Panini *One Piece 
 - UI built: board with filters, card panel (offers by alias, offer/counter composer, accept/reject/leave dialogs), publish, withdraw, Mis tratos, Buscadas, Registro, account (display name, logout). Routes live under `/c/[slug]` (see `src/lib/paths.ts`). Reads in `src/server/queries.ts` (viewer-relative DTOs), writes in `src/server/trading.ts` (one transaction each, outbox events).
 - Out of scope still: card photos (the layout leaves room), notifications.
 - Local end-to-end testing: a local Supabase stack (Docker) isolated from the cloud project. `npm run local:start`, then `npm run local:migrate` and `npm run local:seed` (test users ana/marcos/laura@cromodex.test, passwords in `scripts/seed-local.mjs`), then `npm run local:dev` (set `PORT` to run it beside the normal dev server). `npm run local:check` runs the business-rule checks of `scripts/check-trading.ts` (turns, ownership, concurrent accepts, withdrawals) against the local database. `scripts/local-env.sh` overrides the env so the cloud project is never touched. Claude drives the app with these users.
-- Next step: test with the group on the cloud project, then fixes.
+- Deploy: Dokploy on the VPS, domain cromodex.duckdns.org, step by step in [docs/deploy.md](docs/deploy.md). The image never touches the database at build time (anything that queries must run at request time).
+- Next step: first deploy, then test with the group.
 
 ## Commit messages
 
