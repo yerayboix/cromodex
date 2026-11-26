@@ -12,7 +12,12 @@
     "db:check": "drizzle-kit check",
     "db:studio": "drizzle-kit studio",
     "docker:up": "docker compose --env-file .env.local up --build -d",
-    "docker:down": "docker compose --env-file .env.local down"
+    "docker:down": "docker compose --env-file .env.local down",
+    "local:start": "supabase start",
+    "local:stop": "supabase stop",
+    "local:migrate": "bash -c \". scripts/local-env.sh && drizzle-kit migrate\"",
+    "local:seed": "bash -c \". scripts/local-env.sh && node scripts/seed-local.mjs\"",
+    "local:dev": "bash -c \". scripts/local-env.sh && next dev\""
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
@@ -38,6 +43,7 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "supabase": "^3.4.0",
     "tailwindcss": "4.3.3",
     "typescript": "^5"
   }
