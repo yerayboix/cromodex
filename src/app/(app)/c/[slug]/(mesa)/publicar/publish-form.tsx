@@ -11,7 +11,7 @@ import { btnGhost, btnGold, field } from "@/components/ui-classes";
 import { cardCodeError, isSpecialCode, normalizeCardCode } from "@/lib/collections";
 import { paths } from "@/lib/paths";
 
-import { publishAction } from "../actions";
+import { publishAction } from "@/app/(app)/c/[slug]/actions";
 
 const MAX_COPIES = 10;
 
@@ -71,9 +71,9 @@ export function PublishForm({ slug }: { slug: string }) {
         className="flex flex-1 flex-col gap-3 rounded-t-[22px] bg-parchment px-5 pt-4.5 pb-5 text-ink lg:gap-4.5 lg:rounded-none lg:px-7 lg:pt-5.5 lg:pb-6.5"
       >
         <div className="hidden items-center justify-between lg:flex">
-          <h2 id="publish-title" className="font-display text-[26px]">
+          <h1 id="publish-title" className="font-display text-[26px]">
             Publicar carta
-          </h2>
+          </h1>
           <Link
             href={paths.board(slug)}
             aria-label="Cerrar sin publicar"

@@ -6,7 +6,7 @@ import { BigCard } from "@/components/cards";
 import { Modal } from "@/components/modal";
 import { btnDanger, btnGhost } from "@/components/ui-classes";
 
-import { withdrawListingAction, type ActionState } from "../../actions";
+import { withdrawListingAction, type ActionState } from "@/app/(app)/c/[slug]/actions";
 
 export function WithdrawListing({
   slug,

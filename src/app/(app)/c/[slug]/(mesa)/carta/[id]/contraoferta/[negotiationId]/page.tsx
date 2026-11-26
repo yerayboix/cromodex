@@ -8,7 +8,7 @@ import { paths } from "@/lib/paths";
 import { getCollection } from "@/server/collections";
 import { getListing } from "@/server/queries";
 
-import { counterOfferAction } from "../../../../actions";
+import { counterOfferAction } from "@/app/(app)/c/[slug]/actions";
 import { CardComposer } from "../../card-composer";
 
 export const metadata: Metadata = { title: "Contraoferta" };

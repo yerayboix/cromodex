@@ -9,7 +9,7 @@ import { CodeField, Keypad, useCodeInput, useKeypad } from "@/components/code-en
 import { SwapIcon } from "@/components/icons";
 import { btnPrimary } from "@/components/ui-classes";
 
-import type { ActionState } from "../../actions";
+import type { ActionState } from "@/app/(app)/c/[slug]/actions";
 import { ComposerTitle } from "./panel";
 
 const MAX_CARDS = 10;

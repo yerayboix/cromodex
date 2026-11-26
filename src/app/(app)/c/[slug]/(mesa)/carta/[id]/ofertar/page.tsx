@@ -7,7 +7,7 @@ import { paths } from "@/lib/paths";
 import { getCollection } from "@/server/collections";
 import { getListing } from "@/server/queries";
 
-import { makeOfferAction } from "../../../actions";
+import { makeOfferAction } from "@/app/(app)/c/[slug]/actions";
 import { CardComposer } from "../card-composer";
 
 export const metadata: Metadata = { title: "Hacer una oferta" };

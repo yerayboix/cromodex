@@ -16,7 +16,7 @@ import {
   rejectOfferAction,
   withdrawNegotiationAction,
   type ActionState,
-} from "../../actions";
+} from "@/app/(app)/c/[slug]/actions";
 
 type Preview = {
   otherOffers: number;
