@@ -13,10 +13,24 @@ export const metadata: Metadata = { title: "Publicar carta" };
 /**
  * Phones: a full-screen form. Desktop: a window over the board.
  */
-export default async function PublishPage({ params }: PageProps<"/c/[slug]/publicar">) {
-  const { slug } = await params;
+export default function PublishPage({ params }: PageProps<"/c/[slug]/publicar">) {
   return (
     <main className="relative flex flex-1 flex-col">
+      <Suspense fallback={null}>
+        <PublishContent params={params} />
+      </Suspense>
+    </main>
+  );
+}
+
+async function PublishContent({
+  params,
+}: {
+  params: PageProps<"/c/[slug]/publicar">["params"];
+}) {
+  const { slug } = await params;
+  return (
+    <>
       <div aria-hidden="true" inert className="hidden px-9 pt-7.5 lg:block">
         <Suspense fallback={<BoardSkeleton />}>
           <Board slug={slug} />
@@ -39,6 +53,6 @@ export default async function PublishPage({ params }: PageProps<"/c/[slug]/publi
           <PublishForm slug={slug} />
         </section>
       </div>
-    </main>
+    </>
   );
 }

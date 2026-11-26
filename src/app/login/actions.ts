@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 
+import { DEFAULT_COLLECTION } from "@/lib/collections";
+import { paths } from "@/lib/paths";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type LoginState = { error?: string; email?: string };
@@ -25,5 +27,5 @@ export async function login(
     return { error: "Email o contraseña incorrectos.", email };
   }
 
-  redirect("/");
+  redirect(paths.board(DEFAULT_COLLECTION));
 }

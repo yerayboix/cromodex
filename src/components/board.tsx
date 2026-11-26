@@ -31,7 +31,10 @@ export async function Board({
     getBoard(collection.id, slug, user.id),
     filter === "missing" ? getMyWantedCodes(collection.id, user.id) : null,
   ]);
-  const cards = wantedCodes ? all.filter((c) => wantedCodes.has(c.code)) : all;
+  // "Me faltan": wanted codes someone else is offering (not your own copies).
+  const cards = wantedCodes
+    ? all.filter((c) => !c.isMine && wantedCodes.has(c.code))
+    : all;
 
   if (all.length === 0) return <EmptyBoard slug={slug} />;
 
