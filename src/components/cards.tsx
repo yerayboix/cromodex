@@ -36,6 +36,7 @@ export function BigCard({
         dims,
         className,
       )}
+      style={frameDelay(code)}
     >
       <div className="flex h-(--h) flex-col gap-[5px] rounded-[9px] bg-parchment p-[5px] text-ink">
         <div className="bg-card-blank flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[5px]">
@@ -77,6 +78,7 @@ export function HandCard({
         isNew ? "bg-gold" : isSpecialCode(code) ? "frame-special" : "bg-wood",
         className,
       )}
+      style={frameDelay(code)}
     >
       <span
         className={cn(
@@ -107,6 +109,7 @@ export function MiniCard({
         isSpecialCode(code) ? "frame-special" : "bg-wood",
         className,
       )}
+      style={frameDelay(code)}
     >
       <span
         className={cn(
@@ -135,4 +138,14 @@ export function MiniCards({ codes }: { codes: string[] }) {
 export function joinCodes(codes: string[]): string {
   if (codes.length <= 1) return codes.join("");
   return `${codes.slice(0, -1).join(", ")} y ${codes.at(-1)}`;
+}
+
+/**
+ * Start offset of the special frame animation, stable per seed (a listing id
+ * or a code), so cards on the same table do not turn in sync.
+ */
+export function frameDelay(seed: string): React.CSSProperties {
+  let h = 0;
+  for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) % 997;
+  return { "--frame-delay": `-${(h % 30) / 10}s` } as React.CSSProperties;
 }

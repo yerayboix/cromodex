@@ -180,6 +180,9 @@
   --theme-wood: #6b4226;
   --theme-frame: linear-gradient(180deg, #7a4b2a 0%, #5c371d 100%);
   --theme-frame-special: linear-gradient(135deg, #b87414 0%, #f7de8a 45%, #c98a1e 70%, #fbe9a6 100%);
+  /* Special cards: gold with iridescent glints that turn around the frame. */
+  --theme-frame-special-stops: #b87414, #f7de8a, #ff6fae, #c98a1e, #fbe9a6, #4fc3ff, #b87414, #f7de8a, #9a7bff, #c98a1e, #fbe9a6, #3fd9a0, #b87414;
+  --theme-frame-special-speed: 3s;
   --theme-grid-line: rgb(245 234 211 / 0.06);
   --theme-font-display: var(--font-alfa-slab), serif;
   --theme-font-body: var(--font-archivo), system-ui, sans-serif;
@@ -204,8 +207,27 @@
   background: var(--theme-frame);
 }
 
+@property --frame-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes frame-spin {
+  to {
+    --frame-angle: 360deg;
+  }
+}
+
+/* Animated iridescent frame. Each card sets --frame-delay so the table
+   does not turn in sync; reduced motion keeps the static gold. */
 @utility frame-special {
   background: var(--theme-frame-special);
+  @media (prefers-reduced-motion: no-preference) {
+    background: conic-gradient(from var(--frame-angle), var(--theme-frame-special-stops));
+    animation: frame-spin var(--theme-frame-special-speed) linear infinite;
+    animation-delay: var(--frame-delay, 0s);
+  }
 }
 
 /* Lined paper behind a card that has no photo. */

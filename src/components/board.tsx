@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { frameDelay } from "@/components/cards";
 import { CompassRose } from "@/components/icons";
 import { CollectionMenu } from "@/components/shell/collection-menu";
 import { AccountSlot } from "@/components/shell/server-slots";
@@ -161,6 +162,7 @@ function CardTile({
           "rounded-[10px] p-[3px]",
           isSpecialCode(card.code) ? "frame-special" : "frame-regular",
         )}
+        style={frameDelay(card.id)}
       >
         <div className="flex h-[162px] flex-col gap-[5px] rounded-[7px] bg-parchment p-[5px] lg:h-[200px] lg:gap-1.5 lg:p-1.5">
           <div className="bg-card-blank flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[5px]">
