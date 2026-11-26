@@ -50,7 +50,7 @@ async function WantedContent({ params }: { params: PageProps<"/c/[slug]/buscadas
             />
             <p className="flex items-center gap-1.5 text-[13px] text-muted-ink">
               <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full bg-ok" />
-              Hay al menos una en la mesa. Toca una carta para quitarla.
+              Hay al menos una en la mesa. Pulsa una carta para quitarla.
             </p>
           </>
         ) : (

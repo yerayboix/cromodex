@@ -34,5 +34,5 @@ async function SelectedBoard({
   params: LayoutProps<"/c/[slug]/carta/[id]">["params"];
 }) {
   const { slug, id } = await params;
-  return <Board slug={slug} selectedId={id} />;
+  return <Board slug={slug} selectedId={id} background />;
 }

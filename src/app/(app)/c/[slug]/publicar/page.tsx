@@ -33,7 +33,7 @@ async function PublishContent({
     <>
       <div aria-hidden="true" inert className="hidden px-9 pt-7.5 lg:block">
         <Suspense fallback={<BoardSkeleton />}>
-          <Board slug={slug} />
+          <Board slug={slug} background />
         </Suspense>
       </div>
       <div className="flex flex-1 flex-col lg:fixed lg:inset-0 lg:z-30 lg:items-center lg:justify-center lg:bg-[rgb(4_22_33/0.62)]">

@@ -96,8 +96,8 @@ export function CardComposer({
   const listingCard = <BigCard code={listingCode} size="sm" className="w-[92px] [--h:124px]" />;
   const handLabel =
     listingSide === "give"
-      ? "Pides (toca una para quitarla)"
-      : "Das (toca una para quitarla)";
+      ? "Pides (pulsa una para quitarla)"
+      : "Das (pulsa una para quitarla)";
 
   return (
     <form action={formAction} className="flex flex-1 flex-col">

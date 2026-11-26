@@ -20,12 +20,16 @@ export async function Board({
   slug,
   filter = "all",
   selectedId,
+  background = false,
 }: {
   slug: string;
   filter?: BoardFilter;
   /** Card open in the side panel (desktop). */
   selectedId?: string;
+  /** Shown behind a panel or dialog that has the page heading. */
+  background?: boolean;
 }) {
+  const Heading = background ? "h2" : "h1";
   const [user, collection] = await Promise.all([getCurrentUser(), getCollection(slug)]);
   const [all, wantedCodes] = await Promise.all([
     getBoard(collection.id, slug, user.id),
@@ -36,15 +40,15 @@ export async function Board({
     ? all.filter((c) => !c.isMine && wantedCodes.has(c.code))
     : all;
 
-  if (all.length === 0) return <EmptyBoard slug={slug} />;
+  if (all.length === 0) return <EmptyBoard slug={slug} background={background} />;
 
   return (
     <div className="flex flex-col gap-3 lg:gap-6">
       <div className="flex flex-wrap items-center justify-between gap-2 lg:items-end lg:gap-4">
         <div className="flex items-baseline gap-3.5">
-          <h1 className="sr-only font-display text-[34px] leading-none lg:not-sr-only">
+          <Heading className="sr-only font-display text-[34px] leading-none lg:not-sr-only">
             Mesa
-          </h1>
+          </Heading>
           <span className="hidden text-[15px] text-muted-table lg:inline">
             {countLabel(all.length)}, ninguna con el nombre de su dueño
           </span>
@@ -195,11 +199,12 @@ function Badge({ className, children }: { className: string; children: React.Rea
   );
 }
 
-function EmptyBoard({ slug }: { slug: string }) {
+function EmptyBoard({ slug, background }: { slug: string; background: boolean }) {
+  const Heading = background ? "h2" : "h1";
   return (
     <div className="flex flex-1 flex-col">
       <div className="hidden items-baseline gap-3.5 lg:flex">
-        <h1 className="font-display text-[34px] leading-none">Mesa</h1>
+        <Heading className="font-display text-[34px] leading-none">Mesa</Heading>
         <span className="text-[15px] text-muted-table">0 cartas</span>
       </div>
       <div className="flex flex-1 flex-col items-center justify-center gap-6 px-5 py-16 text-center">
