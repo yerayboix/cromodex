@@ -24,10 +24,14 @@ async function main() {
   console.log("Polling Telegram updates. Ctrl+C to stop.");
   let offset = 0;
   for (;;) {
-    const res = await telegramApi("getUpdates", {
-      offset,
-      timeout: 25,
-      allowed_updates: ["message"],
+    // Long poll: Telegram holds the request up to 25 s, so wait longer.
+    const res = await telegramApi(
+      "getUpdates",
+      { offset, timeout: 25, allowed_updates: ["message"] },
+      40_000,
+    ).catch((error: unknown) => {
+      console.error("getUpdates failed, retrying", error);
+      return { ok: false, result: [] };
     });
     const updates = (res.result as (TelegramUpdate & { update_id: number })[] | undefined) ?? [];
     for (const update of updates) {

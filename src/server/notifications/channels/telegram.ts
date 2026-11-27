@@ -15,14 +15,21 @@ export function telegramConfig() {
 
 type ApiResponse = { ok: boolean; error_code?: number; description?: string; result?: unknown };
 
-/** Calls a Bot API method. Never throws for API errors; returns them. */
-export async function telegramApi(method: string, body: unknown): Promise<ApiResponse> {
+/**
+ * Calls a Bot API method. Never throws for API errors; returns them.
+ * `timeoutMs` must exceed the long-poll timeout when calling getUpdates.
+ */
+export async function telegramApi(
+  method: string,
+  body: unknown,
+  timeoutMs = 10_000,
+): Promise<ApiResponse> {
   const { token } = telegramConfig();
   const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(10_000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   try {
     return (await res.json()) as ApiResponse;
