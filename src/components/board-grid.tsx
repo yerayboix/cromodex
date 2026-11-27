@@ -12,8 +12,8 @@ import { paths } from "@/lib/paths";
 import type { BoardCard } from "@/server/queries";
 
 /**
- * The cards on the table. Reads the filter (?filtro=faltan) and the open
- * card (/carta/:id) from the URL so the board stays mounted while you move
+ * The cards on the table. Reads the filter (?filter=missing) and the open
+ * card (/cards/:id) from the URL so the board stays mounted while you move
  * between the board and a card.
  */
 export function BoardGrid({
@@ -28,8 +28,8 @@ export function BoardGrid({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const onBoard = pathname === paths.board(slug);
-  const missing = onBoard && searchParams.get("filtro") === "faltan";
-  const selectedId = /\/carta\/([^/]+)/.exec(pathname)?.[1];
+  const missing = onBoard && searchParams.get("filter") === "missing";
+  const selectedId = /\/cards\/([^/]+)/.exec(pathname)?.[1];
   // When a panel or dialog is open it carries the page heading.
   const Heading = onBoard ? "h1" : "h2";
 

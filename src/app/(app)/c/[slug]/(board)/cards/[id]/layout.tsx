@@ -1,6 +1,6 @@
 /**
  * Panel of a card, next to the board (desktop) or full screen (phones).
- * The board comes from the shared (mesa) layout and stays mounted.
+ * The board comes from the shared (board) layout and stays mounted.
  */
 export default function CardLayout({ children }: { children: React.ReactNode }) {
   return (

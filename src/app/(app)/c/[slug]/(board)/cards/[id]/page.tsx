@@ -25,7 +25,7 @@ import { WithdrawListing } from "./withdraw-listing";
 
 export const metadata: Metadata = { title: "Carta" };
 
-export default function CardPage({ params }: PageProps<"/c/[slug]/carta/[id]">) {
+export default function CardPage({ params }: PageProps<"/c/[slug]/cards/[id]">) {
   return (
     <Suspense fallback={<PanelSkeleton />}>
       <CardDetail params={params} />
@@ -33,7 +33,7 @@ export default function CardPage({ params }: PageProps<"/c/[slug]/carta/[id]">) 
   );
 }
 
-async function CardDetail({ params }: { params: PageProps<"/c/[slug]/carta/[id]">["params"] }) {
+async function CardDetail({ params }: { params: PageProps<"/c/[slug]/cards/[id]">["params"] }) {
   const { slug, id } = await params;
   const [user, collection] = await Promise.all([getCurrentUser(), getCollection(slug)]);
   const listing = await getListing(id, collection.id, user.id);

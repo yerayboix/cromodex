@@ -8,6 +8,7 @@ import { useActionState, useState } from "react";
 import { logout, updateDisplayName } from "@/app/(app)/actions";
 import { Modal, SheetHandle } from "@/components/modal";
 import { btnOutline, field } from "@/components/ui-classes";
+import { paths } from "@/lib/paths";
 
 /** The signed-in user's own account: display name and sign out. */
 export function AccountMenu({
@@ -74,7 +75,7 @@ export function AccountMenu({
             <span className="text-[15px] font-bold break-all">{email}</span>
           </div>
           <Link
-            href="/elegir-contrasena"
+            href={paths.setPassword}
             onClick={() => setOpen(false)}
             className="flex items-center gap-2 self-start text-[15px] font-bold underline underline-offset-4"
           >

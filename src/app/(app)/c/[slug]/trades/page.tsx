@@ -14,7 +14,7 @@ import { getMyTrades, type MyTradeItem } from "@/server/queries";
 
 export const metadata: Metadata = { title: "Mis tratos" };
 
-export default function MyTradesPage({ params }: PageProps<"/c/[slug]/tratos">) {
+export default function MyTradesPage({ params }: PageProps<"/c/[slug]/trades">) {
   return (
     <SectionPage
       title="Mis tratos"
@@ -30,7 +30,7 @@ export default function MyTradesPage({ params }: PageProps<"/c/[slug]/tratos">) 
 async function MyTradesContent({
   params,
 }: {
-  params: PageProps<"/c/[slug]/tratos">["params"];
+  params: PageProps<"/c/[slug]/trades">["params"];
 }) {
   const { slug } = await params;
   const [user, collection] = await Promise.all([getCurrentUser(), getCollection(slug)]);

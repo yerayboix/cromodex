@@ -13,7 +13,7 @@ import { ComposerSkeleton } from "../panel-skeleton";
 
 export const metadata: Metadata = { title: "Hacer una oferta" };
 
-export default function OfferPage({ params }: PageProps<"/c/[slug]/carta/[id]/ofertar">) {
+export default function OfferPage({ params }: PageProps<"/c/[slug]/cards/[id]/offer">) {
   return (
     <Suspense fallback={<ComposerSkeleton />}>
       <Offer params={params} />
@@ -24,7 +24,7 @@ export default function OfferPage({ params }: PageProps<"/c/[slug]/carta/[id]/of
 async function Offer({
   params,
 }: {
-  params: PageProps<"/c/[slug]/carta/[id]/ofertar">["params"];
+  params: PageProps<"/c/[slug]/cards/[id]/offer">["params"];
 }) {
   const { slug, id } = await params;
   const [user, collection] = await Promise.all([getCurrentUser(), getCollection(slug)]);

@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 
 /** Shown when an invitation link could not be used (/auth/confirm). */
 export function ExpiredLinkNotice() {
-  if (useSearchParams().get("enlace") !== "caducado") return null;
+  if (useSearchParams().get("link") !== "expired") return null;
   return (
     <p
       role="alert"

@@ -1,6 +1,7 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { paths } from "@/lib/paths";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /** Links from Supabase emails that end in choosing a password. */
@@ -21,10 +22,10 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
     if (!error) {
       // New members also pick the name shown in the trade log.
-      return redirectTo(type === "invite" ? "/elegir-contrasena?bienvenida=1" : "/elegir-contrasena");
+      return redirectTo(type === "invite" ? paths.welcome : paths.setPassword);
     }
   }
-  return redirectTo("/login?enlace=caducado");
+  return redirectTo(paths.expiredLink);
 }
 
 /**

@@ -51,5 +51,5 @@ export async function acceptEmailLink(
     refresh_token: refreshToken,
   });
   if (error) return { error: "invalid" };
-  redirect(type === "invite" ? "/elegir-contrasena?bienvenida=1" : "/elegir-contrasena");
+  redirect(type === "invite" ? paths.welcome : paths.setPassword);
 }

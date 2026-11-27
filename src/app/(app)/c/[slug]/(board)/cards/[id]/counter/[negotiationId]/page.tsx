@@ -14,7 +14,7 @@ import { ComposerSkeleton } from "../../panel-skeleton";
 
 export const metadata: Metadata = { title: "Contraoferta" };
 
-type Props = PageProps<"/c/[slug]/carta/[id]/contraoferta/[negotiationId]">;
+type Props = PageProps<"/c/[slug]/cards/[id]/counter/[negotiationId]">;
 
 export default function CounterPage({ params }: Props) {
   return (

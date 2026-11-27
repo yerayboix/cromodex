@@ -11,9 +11,9 @@ export const metadata: Metadata = { title: "Publicar carta" };
 
 /**
  * Phones: a full-screen form. Desktop: a window over the board, which the
- * shared (mesa) layout keeps mounted behind it.
+ * shared (board) layout keeps mounted behind it.
  */
-export default function PublishPage({ params }: PageProps<"/c/[slug]/publicar">) {
+export default function PublishPage({ params }: PageProps<"/c/[slug]/publish">) {
   return (
     <div className="flex flex-1 flex-col lg:fixed lg:inset-0 lg:z-30 lg:items-center lg:justify-center lg:bg-[rgb(4_22_33/0.62)]">
       <Suspense fallback={null}>
@@ -26,7 +26,7 @@ export default function PublishPage({ params }: PageProps<"/c/[slug]/publicar">)
 async function PublishContent({
   params,
 }: {
-  params: PageProps<"/c/[slug]/publicar">["params"];
+  params: PageProps<"/c/[slug]/publish">["params"];
 }) {
   const { slug } = await params;
   return (

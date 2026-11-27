@@ -12,7 +12,7 @@ import { getTradeLog, type TradeView } from "@/server/queries";
 
 export const metadata: Metadata = { title: "Registro" };
 
-export default function LogPage({ params }: PageProps<"/c/[slug]/registro">) {
+export default function LogPage({ params }: PageProps<"/c/[slug]/log">) {
   return (
     <SectionPage
       title="Registro"
@@ -25,7 +25,7 @@ export default function LogPage({ params }: PageProps<"/c/[slug]/registro">) {
   );
 }
 
-async function LogContent({ params }: { params: PageProps<"/c/[slug]/registro">["params"] }) {
+async function LogContent({ params }: { params: PageProps<"/c/[slug]/log">["params"] }) {
   const { slug } = await params;
   const [user, collection] = await Promise.all([getCurrentUser(), getCollection(slug)]);
   const log = await getTradeLog(collection.id, user.id);

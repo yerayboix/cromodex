@@ -14,7 +14,7 @@ import { getTrade } from "@/server/queries";
 
 export const metadata: Metadata = { title: "Trato hecho" };
 
-export default function TradeDonePage({ params }: PageProps<"/c/[slug]/trato/[tradeId]">) {
+export default function TradeDonePage({ params }: PageProps<"/c/[slug]/trades/[tradeId]">) {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-7.5 px-6 pt-6 pb-8 text-center lg:gap-10 lg:p-12">
       <Suspense fallback={null}>
@@ -27,7 +27,7 @@ export default function TradeDonePage({ params }: PageProps<"/c/[slug]/trato/[tr
 async function TradeDone({
   params,
 }: {
-  params: PageProps<"/c/[slug]/trato/[tradeId]">["params"];
+  params: PageProps<"/c/[slug]/trades/[tradeId]">["params"];
 }) {
   const { slug, tradeId } = await params;
   const [user, collection] = await Promise.all([getCurrentUser(), getCollection(slug)]);

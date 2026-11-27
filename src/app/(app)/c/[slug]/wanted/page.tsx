@@ -12,7 +12,7 @@ import { WantedForm, WantedList } from "./wanted-client";
 
 export const metadata: Metadata = { title: "Buscadas" };
 
-export default function WantedPage({ params }: PageProps<"/c/[slug]/buscadas">) {
+export default function WantedPage({ params }: PageProps<"/c/[slug]/wanted">) {
   return (
     <SectionPage
       title="Buscadas"
@@ -25,7 +25,7 @@ export default function WantedPage({ params }: PageProps<"/c/[slug]/buscadas">) 
   );
 }
 
-async function WantedContent({ params }: { params: PageProps<"/c/[slug]/buscadas">["params"] }) {
+async function WantedContent({ params }: { params: PageProps<"/c/[slug]/wanted">["params"] }) {
   const { slug } = await params;
   const [user, collection] = await Promise.all([getCurrentUser(), getCollection(slug)]);
   const { mine, group } = await getWanted(collection.id, slug, user.id);

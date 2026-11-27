@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useTransition } from "react";
 
+import { paths } from "@/lib/paths";
+
 import { acceptEmailLink } from "./actions";
 
 /** Link types that end in choosing a password. */
@@ -24,7 +26,7 @@ export function EmailLinkHandler() {
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
 
     if (hash.has("error")) {
-      router.replace("/login?enlace=caducado");
+      router.replace(paths.expiredLink);
       return;
     }
     const type = hash.get("type") ?? "";
@@ -37,7 +39,7 @@ export function EmailLinkHandler() {
         hash.get("refresh_token") ?? "",
         type,
       );
-      if (result?.error) router.replace("/login?enlace=caducado");
+      if (result?.error) router.replace(paths.expiredLink);
     });
   }, [router]);
 
