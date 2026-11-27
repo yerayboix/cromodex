@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth";
 import { paths } from "@/lib/paths";
 import { getCollection } from "@/server/collections";
 import { TradeError } from "@/server/errors";
+import { dispatchNotifications } from "@/server/notifications/dispatch";
 import {
   acceptOffer,
   counterOffer,
@@ -32,6 +34,9 @@ async function attempt(fn: () => Promise<unknown>): Promise<ActionState | null> 
     // Re-render the whole collection shell too (turn badge, board beside the
     // panel): a redirect alone keeps the shared layout from the router cache.
     revalidatePath("/c/[slug]", "layout");
+    // Notify whoever this concerns once the response is out; the scheduled
+    // dispatch retries anything that fails here.
+    after(dispatchNotifications);
     return null;
   } catch (e) {
     if (e instanceof TradeError) return { error: e.message };

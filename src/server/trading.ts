@@ -50,8 +50,18 @@ function sameCards(a: string[], b: string[]) {
   return sa.length === sb.length && sa.every((c, i) => c === sb[i]);
 }
 
-async function emit(tx: Tx, type: string, payload: Record<string, unknown>) {
-  await tx.insert(events).values({ type, payload });
+/**
+ * Records a domain event in the outbox. `actorId` is who caused it, so
+ * notifications never go to the person who did the action; events are
+ * server-only, never sent to a client.
+ */
+async function emit(
+  tx: Tx,
+  actorId: string,
+  type: string,
+  payload: Record<string, unknown>,
+) {
+  await tx.insert(events).values({ type, payload: { ...payload, actorId } });
 }
 
 // -------------------------------------------------------------- listings
@@ -83,7 +93,7 @@ export async function publishListings(input: {
       )
       .returning({ id: listings.id });
     for (const r of rows) {
-      await emit(tx, "listing.created", { listingId: r.id, cardCode: code });
+      await emit(tx, input.userId, "listing.created", { listingId: r.id, cardCode: code });
     }
   });
 }
@@ -107,9 +117,9 @@ export async function withdrawListing(userId: string, listingId: string) {
       .set({ status: "withdrawn" })
       .where(eq(listings.id, listingId));
     const cancelled = await closeOpen(tx, eq(negotiations.listingId, listingId), "cancelled");
-    await emit(tx, "listing.withdrawn", { listingId });
+    await emit(tx, userId, "listing.withdrawn", { listingId });
     for (const id of cancelled) {
-      await emit(tx, "negotiation.cancelled", { negotiationId: id, reason: "listing.withdrawn" });
+      await emit(tx, userId, "negotiation.cancelled", { negotiationId: id, reason: "listing.withdrawn" });
     }
   });
 }
@@ -167,7 +177,7 @@ export async function makeOffer(input: {
     await tx
       .insert(proposals)
       .values({ negotiationId: neg.id, by: "offerer", seq: 1, cards });
-    await emit(tx, "negotiation.offered", { negotiationId: neg.id, listingId: listing.id, cards });
+    await emit(tx, input.userId, "negotiation.offered", { negotiationId: neg.id, listingId: listing.id, cards });
   });
 }
 
@@ -233,7 +243,7 @@ export async function counterOffer(input: {
       .update(negotiations)
       .set({ turn: party === "owner" ? "offerer" : "owner" })
       .where(eq(negotiations.id, neg.id));
-    await emit(tx, "negotiation.countered", { negotiationId: neg.id, by: party, cards });
+    await emit(tx, input.userId, "negotiation.countered", { negotiationId: neg.id, by: party, cards });
   });
 }
 
@@ -242,7 +252,7 @@ export async function rejectOffer(userId: string, negotiationId: string) {
     const { neg, party } = await lockNegotiation(tx, userId, negotiationId);
     if (neg.turn !== party) throw new TradeError("Ahora no te toca responder.");
     await closeOpen(tx, eq(negotiations.id, neg.id), "rejected");
-    await emit(tx, "negotiation.rejected", { negotiationId: neg.id, by: party });
+    await emit(tx, userId, "negotiation.rejected", { negotiationId: neg.id, by: party });
   });
 }
 
@@ -251,7 +261,7 @@ export async function withdrawFromNegotiation(userId: string, negotiationId: str
   await getDb().transaction(async (tx) => {
     const { neg, party } = await lockNegotiation(tx, userId, negotiationId);
     await closeOpen(tx, eq(negotiations.id, neg.id), "withdrawn");
-    await emit(tx, "negotiation.withdrawn", { negotiationId: neg.id, by: party });
+    await emit(tx, userId, "negotiation.withdrawn", { negotiationId: neg.id, by: party });
   });
 }
 
@@ -320,12 +330,12 @@ export async function acceptOffer(userId: string, negotiationId: string) {
       ? await closeOpen(tx, inArray(negotiations.id, conflicting), "cancelled")
       : [];
 
-    await emit(tx, "trade.accepted", { tradeId: trade.id, negotiationId: neg.id, by: party });
+    await emit(tx, userId, "trade.accepted", { tradeId: trade.id, negotiationId: neg.id, by: party });
     for (const id of sameListing) {
-      await emit(tx, "negotiation.cancelled", { negotiationId: id, reason: "listing.traded" });
+      await emit(tx, userId, "negotiation.cancelled", { negotiationId: id, reason: "listing.traded" });
     }
     for (const id of conflicts) {
-      await emit(tx, "negotiation.cancelled", { negotiationId: id, reason: "cards.traded" });
+      await emit(tx, userId, "negotiation.cancelled", { negotiationId: id, reason: "cards.traded" });
     }
     return trade.id;
   });
