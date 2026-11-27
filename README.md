@@ -13,6 +13,7 @@ counter-offer until you agree, and only then find out who you traded with.
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-Postgres-c5f74f?logo=drizzle)
 ![Supabase](https://img.shields.io/badge/Supabase-Auth_%2B_Postgres-3ecf8e?logo=supabase)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 </div>
 
@@ -375,4 +376,9 @@ Supabase settings, notifications): [docs/deploy.md](docs/deploy.md).
 
 ## License
 
-No license has been chosen yet; until one is added, all rights are reserved.
+[MIT](LICENSE) © 2026 yerayboix.
+
+*One Piece* and the sticker collection belong to their respective owners
+(Eiichiro Oda, Shueisha, Toei Animation, Panini). cromodex is a fan-made tool
+for trading stickers among friends and is not affiliated with them; it ships
+no official artwork, only card codes.
