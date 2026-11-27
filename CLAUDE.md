@@ -34,6 +34,7 @@ Anonymous card-trading board for a closed group of 6 friends (Panini *One Piece 
 - Out of scope still: card photos (the layout leaves room), notifications.
 - Local end-to-end testing: a local Supabase stack (Docker) isolated from the cloud project. `npm run local:start`, then `npm run local:migrate` and `npm run local:seed` (test users ana/marcos/laura@cromodex.test, passwords in `scripts/seed-local.mjs`), then `npm run local:dev` (set `PORT` to run it beside the normal dev server). `npm run local:check` runs the business-rule checks of `scripts/check-trading.ts` (turns, ownership, concurrent accepts, withdrawals) against the local database. `scripts/local-env.sh` overrides the env so the cloud project is never touched. Claude drives the app with these users.
 - Deploy: Dokploy on the VPS, domain cromodex.duckdns.org, step by step in [docs/deploy.md](docs/deploy.md). The image never touches the database at build time (anything that queries must run at request time).
+- Notifications: pluggable module in `src/server/notifications/` (rules → messages → channels; Telegram and console). Setup in docs/deploy.md §8, design in docs/notifications.md. `npm run local:check` covers rules and the Telegram channel with a fake Bot API.
 - Next step: first deploy, then test with the group.
 
 ## Commit messages

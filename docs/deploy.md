@@ -95,6 +95,42 @@ is a themed template whose link goes to `/auth/confirm`, which the app also hand
 3. Dokploy shows the container as healthy; the logs have no `DATABASE_URL`
    or pooler errors.
 
+## 8. Notifications (Telegram)
+
+How the module works: [notifications.md](notifications.md). Order matters:
+
+1. **Migrate** (adds the notification tables): `npm run db:migrate` from WSL.
+2. **Create the bot**: in Telegram, talk to @BotFather → `/newbot`, pick a name
+   (`cromodex`) and a username ending in `bot`. It gives you the token. Optionally
+   set its picture and description there too.
+3. **Variables** in Dokploy (Environment, runtime only):
+
+   | Name | Value |
+   | --- | --- |
+   | `APP_URL` | `https://cromodex.duckdns.org` |
+   | `TELEGRAM_BOT_TOKEN` | token from BotFather (secret) |
+   | `TELEGRAM_BOT_USERNAME` | the bot username, without `@` |
+   | `TELEGRAM_WEBHOOK_SECRET` | a long random string (secret) |
+   | `NOTIFICATIONS_CRON_SECRET` | another long random string (secret) |
+
+   Redeploy. A random string: `openssl rand -hex 32`.
+4. **Webhook**: put the same Telegram values and `APP_URL` in `.env.local` and run
+   `npm run telegram:webhook` from WSL. It tells Telegram to send the bot's
+   messages to `/api/telegram/webhook`.
+5. **Schedule** in Dokploy (Application → Schedules), every 5 minutes
+   (`*/5 * * * *`), command run inside the app container:
+
+   ```sh
+   wget -qO- --post-data= --header="Authorization: Bearer $NOTIFICATIONS_CRON_SECRET" http://127.0.0.1:3000/api/notifications/dispatch
+   ```
+
+   Actions already notify right away; this retries failures and sends the
+   batched "cartas que buscas" notices.
+6. **Check**: *Tu cuenta* now shows *Avisos → Conectar Telegram*. Connect, have
+   someone make you an offer, and the message arrives.
+
+Without the Telegram variables the section stays hidden and nothing is sent.
+
 ## Test the production image locally
 
 ```bash

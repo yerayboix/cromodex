@@ -79,7 +79,8 @@ messages; it is the default locally and proves the seam.
 
 Runs right after each action (`after()` from `next/server`, so the user does
 not wait) and every few minutes from a Dokploy schedule calling
-`POST /api/notifications/dispatch` with a secret, for retries and batching.
+`POST /api/notifications/dispatch` with a secret (`Authorization: Bearer
+NOTIFICATIONS_CRON_SECRET`), for retries and batching.
 Quiet hours: 23:00–09:00 Europe/Madrid, messages arrive without sound.
 
 ## Telegram

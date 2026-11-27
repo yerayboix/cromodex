@@ -8,7 +8,12 @@ const LOGIN_PATH = "/login";
  * Reachable without a session: the login, the email-link handler and the
  * webhooks, which authenticate themselves with a secret.
  */
-const PUBLIC_PATHS = new Set([LOGIN_PATH, "/auth/confirm", "/api/telegram/webhook"]);
+const PUBLIC_PATHS = new Set([
+  LOGIN_PATH,
+  "/auth/confirm",
+  "/api/telegram/webhook",
+  "/api/notifications/dispatch",
+]);
 
 /**
  * Refreshes the Supabase session on every request and gates the app:
