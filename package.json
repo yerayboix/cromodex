@@ -18,7 +18,9 @@
     "local:migrate": "bash -c \". scripts/local-env.sh && drizzle-kit migrate\"",
     "local:seed": "bash -c \". scripts/local-env.sh && node scripts/seed-local.mjs\"",
     "local:dev": "bash -c \". scripts/local-env.sh && next dev\"",
-    "local:check": "bash -c \". scripts/local-env.sh && tsx --conditions=react-server scripts/check-trading.ts && tsx --conditions=react-server scripts/check-notifications.ts\""
+    "local:check": "bash -c \". scripts/local-env.sh && tsx --conditions=react-server scripts/check-trading.ts && tsx --conditions=react-server scripts/check-notifications.ts && tsx --conditions=react-server scripts/check-telegram.ts\"",
+    "telegram:webhook": "bash -c \"set -a && . ./.env.local && set +a && tsx --conditions=react-server scripts/telegram-webhook.ts\"",
+    "telegram:poll": "bash -c \". scripts/local-env.sh && tsx --conditions=react-server scripts/telegram-poll.ts\""
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

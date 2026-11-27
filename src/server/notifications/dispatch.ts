@@ -10,7 +10,7 @@ import {
   notificationPreferences,
 } from "@/db/schema";
 
-import { activeChannels, getChannel } from "./channels";
+import { activeChannels, getChannel, type SendResult } from "./channels";
 import { renderMessage, renderWantedBatch } from "./messages";
 import { notificationsFor } from "./rules";
 import { topicOf, type Message } from "./types";
@@ -173,11 +173,12 @@ export async function deliver(): Promise<number> {
       continue;
     }
 
-    let result: Awaited<ReturnType<typeof channel.send>>;
+    let result: SendResult;
     let error = "";
     try {
-      result = await channel.send(address, message, { silent });
+      ({ result, error = "" } = await channel.send(address, message, { silent }));
     } catch (e) {
+      // Network errors and the like: try again later.
       result = "retry";
       error = e instanceof Error ? e.message : String(e);
     }
@@ -198,6 +199,8 @@ export async function deliver(): Promise<number> {
           ),
         );
       await fail(ids, "recipient gone");
+    } else if (result === "failed") {
+      await fail(ids, error || "rejected by the channel");
     } else {
       const attempts = first.attempts + 1;
       if (attempts >= MAX_ATTEMPTS) {

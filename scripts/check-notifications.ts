@@ -68,20 +68,31 @@ async function main() {
   const sent = async () => {
     await fanOut();
     const rows = await db
-      .select({ userId: notificationDeliveries.userId, kind: notificationDeliveries.kind, message: notificationDeliveries.message })
+      .select({
+        id: notificationDeliveries.id,
+        userId: notificationDeliveries.userId,
+        kind: notificationDeliveries.kind,
+        message: notificationDeliveries.message,
+      })
       .from(notificationDeliveries)
       .innerJoin(events, eq(events.id, notificationDeliveries.eventId))
       .where(and(gte(events.createdAt, start), eq(notificationDeliveries.channel, "console")));
     return rows;
   };
   const who = (id: string) => (id === ana ? "ana" : id === marcos ? "marcos" : id === laura ? "laura" : "other");
-  const since = async (from: number) => (await sent()).slice(from).map((r) => `${who(r.userId)}:${r.kind}`).sort();
+  /** Deliveries created after the snapshot `before` (a set of ids). */
+  const since = async (before: Set<string>) =>
+    (await sent())
+      .filter((r) => !before.has(r.id))
+      .map((r) => `${who(r.userId)}:${r.kind}`)
+      .sort();
+  const snapshot = async () => new Set((await sent()).map((r) => r.id));
 
   // --- wanted
   await addWanted(marcos, col.id, slug, "F27");
   await addWanted(laura, col.id, slug, "F27");
   await addWanted(ana, col.id, slug, "F27");
-  let n = (await sent()).length;
+  let n = await snapshot();
   await publishListings({ userId: ana, collectionId: col.id, slug, code: "F27", copies: 1 });
   const l = await latestListing(ana);
   ok(
@@ -91,22 +102,22 @@ async function main() {
   );
 
   // --- offer and counters
-  n = (await sent()).length;
+  n = await snapshot();
   await makeOffer({ userId: marcos, slug, listingId: l.id, cards: ["1"] });
   ok("an offer notifies the owner only", (await since(n)).join() === "ana:offer.received", (await since(n)).join());
 
   const neg = await openNeg(l.id, marcos);
-  n = (await sent()).length;
+  n = await snapshot();
   await counterOffer({ userId: ana, slug, negotiationId: neg.id, cards: ["1", "2"] });
   ok("the owner's counter notifies the offerer", (await since(n)).join() === "marcos:counter.received", (await since(n)).join());
 
-  n = (await sent()).length;
+  n = await snapshot();
   await counterOffer({ userId: marcos, slug, negotiationId: neg.id, cards: ["1", "3"] });
   ok("the offerer's counter notifies the owner", (await since(n)).join() === "ana:counter.received", (await since(n)).join());
 
   // --- accept: the other offer is cancelled
   await makeOffer({ userId: laura, slug, listingId: l.id, cards: ["4"] });
-  n = (await sent()).length;
+  n = await snapshot();
   await acceptOffer(ana, neg.id);
   ok(
     "accepting tells the offerer and closes the other offer",
@@ -118,13 +129,13 @@ async function main() {
   await publishListings({ userId: laura, collectionId: col.id, slug, code: "5", copies: 1 });
   const l2 = await latestListing(laura);
   await makeOffer({ userId: ana, slug, listingId: l2.id, cards: ["6"] });
-  n = (await sent()).length;
+  n = await snapshot();
   await rejectOffer(laura, (await openNeg(l2.id, ana)).id);
   ok("a rejection notifies the offerer", (await since(n)).join() === "ana:offer.closed", (await since(n)).join());
 
   // --- preferences
   await db.insert(notificationPreferences).values({ userId: laura, topic: "wanted", enabled: false });
-  n = (await sent()).length;
+  n = await snapshot();
   await publishListings({ userId: ana, collectionId: col.id, slug, code: "F27", copies: 1 });
   ok("a member who switched off 'wanted' gets nothing", (await since(n)).join() === "marcos:wanted.available", (await since(n)).join());
 

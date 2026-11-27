@@ -4,8 +4,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { supabaseEnv } from "@/lib/supabase/env";
 
 const LOGIN_PATH = "/login";
-/** Reachable without a session: the login and the email-link handler. */
-const PUBLIC_PATHS = new Set([LOGIN_PATH, "/auth/confirm"]);
+/**
+ * Reachable without a session: the login, the email-link handler and the
+ * webhooks, which authenticate themselves with a secret.
+ */
+const PUBLIC_PATHS = new Set([LOGIN_PATH, "/auth/confirm", "/api/telegram/webhook"]);
 
 /**
  * Refreshes the Supabase session on every request and gates the app:

@@ -1,7 +1,17 @@
 import type { Message } from "../types";
 
-/** Outcome of one send. `gone`: the member blocked or unlinked us. */
-export type SendResult = "sent" | "retry" | "gone";
+/**
+ * Outcome of one send. `retry`: temporary problem, try again later. `gone`: the
+ * member blocked or unlinked us (the destination is removed). `failed`:
+ * permanent error, do not retry.
+ */
+export type SendResult = "sent" | "retry" | "gone" | "failed";
+
+export type SendOutcome = {
+  result: SendResult;
+  /** Stored in the delivery for debugging. */
+  error?: string;
+};
 
 /**
  * A way to deliver messages. Adding a channel means implementing this and
@@ -17,7 +27,7 @@ export interface NotificationChannel {
    * user id as address (used by the console channel in development).
    */
   readonly implicit?: boolean;
-  send(address: string, message: Message, options: { silent: boolean }): Promise<SendResult>;
+  send(address: string, message: Message, options: { silent: boolean }): Promise<SendOutcome>;
   /** URL that starts linking this channel with a one-time token. */
   linkUrl?(token: string): string;
 }

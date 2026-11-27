@@ -17,6 +17,6 @@ export const consoleChannel: NotificationChannel = {
     console.info(
       `[notification:console] to=${address}${silent ? " (silent)" : ""}\n  ${message.title}\n  ${message.body}\n  ${message.url}`,
     );
-    return "sent";
+    return { result: "sent" };
   },
 };
