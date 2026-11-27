@@ -7,29 +7,30 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 const ACCEPTED: readonly EmailOtpType[] = ["invite", "recovery"];
 
 /**
- * Target of the invitation email (see supabase/templates/invite.html):
- * verifies the one-time token, which signs the user in, and sends them to
- * choose their password. Any bad or expired link goes back to the login.
+ * Target of the themed invitation email (supabase/templates/invite.html),
+ * used only with custom SMTP: verifies the one-time token, which signs the
+ * user in, and sends them to choose their password. Bad or expired links go
+ * back to the login.
  */
 export async function GET(request: NextRequest) {
   const tokenHash = request.nextUrl.searchParams.get("token_hash");
   const type = request.nextUrl.searchParams.get("type") as EmailOtpType | null;
 
-  const target = request.nextUrl.clone();
-  target.search = "";
-
   if (tokenHash && type && ACCEPTED.includes(type)) {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
     if (!error) {
-      target.pathname = "/elegir-contrasena";
       // New members also pick the name shown in the trade log.
-      if (type === "invite") target.searchParams.set("bienvenida", "1");
-      return NextResponse.redirect(target);
+      return redirectTo(type === "invite" ? "/elegir-contrasena?bienvenida=1" : "/elegir-contrasena");
     }
   }
+  return redirectTo("/login?enlace=caducado");
+}
 
-  target.pathname = "/login";
-  target.searchParams.set("enlace", "caducado");
-  return NextResponse.redirect(target);
+/**
+ * Relative redirect: behind the reverse proxy the server only knows its
+ * internal address (0.0.0.0:3000), so an absolute URL would point there.
+ */
+function redirectTo(path: string) {
+  return new NextResponse(null, { status: 307, headers: { Location: path } });
 }
