@@ -282,13 +282,8 @@
       //   "sender_name": "Admin"
       // },
 
-      // Same template as the cloud project (see supabase/templates/invite.html).
-      "template": {
-        "invite": {
-          "subject": "Te han invitado a cromodex",
-          "content_path": "./supabase/templates/invite.html"
-        }
-      },
+      // Default templates, like the cloud project (custom ones need custom SMTP).
+      // supabase/templates/invite.html is ready if that ever changes.
 
       // Uncomment to customize notification email template
       // "notification": {

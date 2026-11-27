@@ -74,16 +74,19 @@ Authentication → **URL Configuration**:
 - **Site URL**: `https://cromodex.duckdns.org` (Supabase builds email links from it).
 - **Redirect URLs**: `https://cromodex.duckdns.org/**`.
 
-Authentication → **Emails** → **Invite user**: subject `Te han invitado a cromodex` and, as
-body, the contents of [`supabase/templates/invite.html`](../supabase/templates/invite.html).
-The link must stay `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite`:
-the app verifies it there and asks the new member for their name and password.
+Invitations work with Supabase's **default email templates** (custom templates need
+custom SMTP). The invite link goes through Supabase, which redirects to the Site URL with
+the session in the URL fragment; the login page completes it server-side and opens
+*Elige tu contraseña* (name and password).
 
 Adding someone to the group: Authentication → Users → *Invite user* with their email.
-Sign-ups stay disabled. Invitation links work once and expire after **Email OTP
-Expiration** (Authentication → Sign In / Providers → Email). The default is 1 hour; set it to
-`86400` (24 hours, the maximum), which is what the email promises. A used or expired link
-shows a notice on the login page.
+Sign-ups stay disabled. The invitee should open the link on a browser where nobody is
+signed in to cromodex. Links work once and expire after **Email OTP Expiration**
+(Authentication → Sign In / Providers → Email, default 1 hour; up to `86400` = 24 hours).
+A used or expired link shows a notice on the login page.
+
+If custom SMTP is ever added, [`supabase/templates/invite.html`](../supabase/templates/invite.html)
+is a themed template whose link goes to `/auth/confirm`, which the app also handles.
 
 ## 7. Check after deploying
 

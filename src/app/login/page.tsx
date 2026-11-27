@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { AuthFrame } from "@/components/auth-frame";
 
+import { EmailLinkHandler } from "./email-link-handler";
 import { ExpiredLinkNotice } from "./expired-link-notice";
 import { LoginForm } from "./login-form";
 
@@ -14,6 +15,7 @@ export default function LoginPage() {
       <Suspense fallback={null}>
         <ExpiredLinkNotice />
       </Suspense>
+      <EmailLinkHandler />
       <LoginForm />
     </AuthFrame>
   );

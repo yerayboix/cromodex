@@ -29,3 +29,27 @@ export async function login(
 
   redirect(paths.board(DEFAULT_COLLECTION));
 }
+
+export type EmailLinkState = { error?: string };
+
+/**
+ * Finishes an invitation or recovery link sent with Supabase's default
+ * email templates: Supabase verifies the link and redirects here with the
+ * session in the URL fragment, which only the browser can read. The client
+ * hands the tokens over once; the session is stored in cookies server-side,
+ * like a normal login, and the browser never keeps them.
+ */
+export async function acceptEmailLink(
+  accessToken: string,
+  refreshToken: string,
+  type: string,
+): Promise<EmailLinkState> {
+  if (!accessToken || !refreshToken) return { error: "invalid" };
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  });
+  if (error) return { error: "invalid" };
+  redirect(type === "invite" ? "/elegir-contrasena?bienvenida=1" : "/elegir-contrasena");
+}
