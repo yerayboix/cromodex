@@ -7,17 +7,21 @@ import { useActionState, useState } from "react";
 
 import { logout, updateDisplayName } from "@/app/(app)/actions";
 import { Modal, SheetHandle } from "@/components/modal";
+import { NotificationsSection } from "@/components/shell/notifications-section";
 import { btnOutline, field } from "@/components/ui-classes";
 import { paths } from "@/lib/paths";
+import type { NotificationSettings } from "@/server/notifications/settings";
 
-/** The signed-in user's own account: display name and sign out. */
+/** The signed-in user's own account: name, notifications, password, sign out. */
 export function AccountMenu({
   displayName,
   email,
+  notifications,
   variant,
 }: {
   displayName: string;
   email: string;
+  notifications: NotificationSettings;
   /** "avatar": round initial (phone header); "sidebar": desktop row. */
   variant: "avatar" | "sidebar";
 }) {
@@ -70,6 +74,7 @@ export function AccountMenu({
             </button>
           </div>
           <NameForm displayName={displayName} />
+          {notifications.channels.length > 0 && <NotificationsSection settings={notifications} />}
           <div className="flex flex-col gap-1 border-t border-[#dccba6] pt-3.5">
             <span className="text-[13px] text-muted-ink">Has entrado como</span>
             <span className="text-[15px] font-bold break-all">{email}</span>

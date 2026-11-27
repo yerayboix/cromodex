@@ -6,6 +6,7 @@ import type { NotificationChannel } from "./types";
  */
 export const consoleChannel: NotificationChannel = {
   id: "console",
+  label: "Consola",
   implicit: true,
   isConfigured() {
     return (

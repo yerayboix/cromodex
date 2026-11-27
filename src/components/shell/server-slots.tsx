@@ -1,6 +1,7 @@
 import { cn } from "cn";
 
 import { getCurrentUser } from "@/lib/auth";
+import { getNotificationSettings } from "@/server/notifications/settings";
 import { countMyTurn } from "@/server/queries";
 import { getCollection } from "@/server/collections";
 
@@ -37,7 +38,13 @@ export async function TurnBadge({
 
 export async function AccountSlot({ variant }: { variant: "avatar" | "sidebar" }) {
   const user = await getCurrentUser();
+  const notifications = await getNotificationSettings(user.id);
   return (
-    <AccountMenu displayName={user.displayName} email={user.email} variant={variant} />
+    <AccountMenu
+      displayName={user.displayName}
+      email={user.email}
+      notifications={notifications}
+      variant={variant}
+    />
   );
 }

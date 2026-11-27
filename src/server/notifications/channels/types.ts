@@ -20,6 +20,8 @@ export type SendOutcome = {
 export interface NotificationChannel {
   /** Stored in the database, so keep it stable ("telegram", "console"…). */
   readonly id: string;
+  /** Name shown to members (UI copy). */
+  readonly label: string;
   /** Its configuration (env vars) is present. */
   isConfigured(): boolean;
   /**

@@ -62,6 +62,7 @@ export function classify(response: ApiResponse): SendResult {
 
 export const telegramChannel: NotificationChannel = {
   id: "telegram",
+  label: "Telegram",
   isConfigured() {
     const { token, username } = telegramConfig();
     return Boolean(token && username);

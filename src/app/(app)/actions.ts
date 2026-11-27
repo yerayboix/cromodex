@@ -8,6 +8,10 @@ import { getDb } from "@/db";
 import { profiles } from "@/db/schema";
 import { getCurrentUser } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getChannel } from "@/server/notifications/channels";
+import { createLinkToken, unlinkUser } from "@/server/notifications/linking";
+import { setTopic } from "@/server/notifications/settings";
+import type { Topic } from "@/server/notifications/types";
 
 export async function logout() {
   const supabase = await createSupabaseServerClient();
@@ -37,4 +41,30 @@ export async function updateDisplayName(
     .where(eq(profiles.id, user.id));
   refresh();
   return { saved: true };
+}
+
+// --------------------------------------------------------- notifications
+
+/** One-time link to connect a channel (e.g. t.me/<bot>?start=<code>). */
+export async function startChannelLink(channelId: string): Promise<{ url?: string; error?: string }> {
+  const user = await getCurrentUser();
+  const channel = getChannel(channelId);
+  if (!channel?.linkUrl || channel.implicit) return { error: "Este canal no está disponible." };
+  const token = await createLinkToken(user.id, channel.id);
+  return { url: channel.linkUrl(token) };
+}
+
+export async function unlinkChannel(channelId: string) {
+  const user = await getCurrentUser();
+  await unlinkUser(user.id, channelId);
+  refresh();
+}
+
+const TOPICS: readonly Topic[] = ["trades", "wanted"];
+
+export async function setNotificationTopic(topic: Topic, enabled: boolean) {
+  const user = await getCurrentUser();
+  if (!TOPICS.includes(topic)) return;
+  await setTopic(user.id, topic, enabled);
+  refresh();
 }
