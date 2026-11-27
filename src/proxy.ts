@@ -4,6 +4,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { supabaseEnv } from "@/lib/supabase/env";
 
 const LOGIN_PATH = "/login";
+/** Reachable without a session: the login and the email-link handler. */
+const PUBLIC_PATHS = new Set([LOGIN_PATH, "/auth/confirm"]);
 
 /**
  * Refreshes the Supabase session on every request and gates the app:
@@ -39,9 +41,10 @@ export async function proxy(request: NextRequest) {
   // getClaims() validates the JWT and refreshes the session if needed.
   const { data } = await supabase.auth.getClaims();
   const signedIn = Boolean(data?.claims?.sub);
-  const onLogin = request.nextUrl.pathname === LOGIN_PATH;
+  const pathname = request.nextUrl.pathname;
+  const onLogin = pathname === LOGIN_PATH;
 
-  if (!signedIn && !onLogin) return redirectKeepingCookies(request, response, LOGIN_PATH);
+  if (!signedIn && !PUBLIC_PATHS.has(pathname)) return redirectKeepingCookies(request, response, LOGIN_PATH);
   if (signedIn && onLogin) return redirectKeepingCookies(request, response, "/");
 
   return response;

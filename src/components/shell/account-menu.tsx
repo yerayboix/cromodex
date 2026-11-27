@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "cn";
-import { LogOut, X } from "lucide-react";
+import { KeyRound, LogOut, X } from "lucide-react";
+import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { logout, updateDisplayName } from "@/app/(app)/actions";
@@ -72,6 +73,14 @@ export function AccountMenu({
             <span className="text-[13px] text-muted-ink">Has entrado como</span>
             <span className="text-[15px] font-bold break-all">{email}</span>
           </div>
+          <Link
+            href="/elegir-contrasena"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 self-start text-[15px] font-bold underline underline-offset-4"
+          >
+            <KeyRound className="size-[18px]" />
+            Cambiar contraseña
+          </Link>
           <form action={logout}>
             <button type="submit" className={cn(btnOutline, "w-full")}>
               <LogOut className="size-5" />

@@ -69,13 +69,21 @@ Ports 80 and 443 of the VPS must be open for the certificate challenge.
 
 ## 6. Supabase
 
-- **Authentication → URL Configuration → Site URL**: `https://cromodex.duckdns.org`.
-  Login is email + password through Server Actions, so no redirect URLs are
-  needed.
-- Sign-ups stay disabled; create the group's users in **Authentication →
-  Users** (optionally with `display_name` in the user metadata; otherwise the
-  name is the part of the email before `@`, and each user can change it in
-  *Tu cuenta*).
+Authentication → **URL Configuration**:
+
+- **Site URL**: `https://cromodex.duckdns.org` (Supabase builds email links from it).
+- **Redirect URLs**: `https://cromodex.duckdns.org/**`.
+
+Authentication → **Emails** → **Invite user**: subject `Te han invitado a cromodex` and, as
+body, the contents of [`supabase/templates/invite.html`](../supabase/templates/invite.html).
+The link must stay `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite`:
+the app verifies it there and asks the new member for their name and password.
+
+Adding someone to the group: Authentication → Users → *Invite user* with their email.
+Sign-ups stay disabled. Invitation links work once and expire after **Email OTP
+Expiration** (Authentication → Sign In / Providers → Email). The default is 1 hour; set it to
+`86400` (24 hours, the maximum), which is what the email promises. A used or expired link
+shows a notice on the login page.
 
 ## 7. Check after deploying
 

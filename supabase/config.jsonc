@@ -120,7 +120,7 @@
   // Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
   // are monitored, and you can view the emails that would have been sent from the web interface.
   "local_smtp": {
-    "enabled": false,
+    "enabled": true,
     // Port to use for the email testing server web interface.
     "port": 54324,
     // Uncomment to expose additional ports for testing user applications that send emails.
@@ -186,11 +186,11 @@
     "enabled": true,
     // The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
     // in emails.
-    "site_url": "http://127.0.0.1:3000",
+    "site_url": "http://localhost:3100",
     // The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
     // "external_url": "",
     // A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-    "additional_redirect_urls": ["https://127.0.0.1:3000"],
+    "additional_redirect_urls": ["http://localhost:3100/**"],
     // How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
     "jwt_expiry": 3600,
     // JWT issuer URL. If not set, defaults to auth.external_url.
@@ -269,7 +269,7 @@
       // Number of characters used in the email OTP.
       "otp_length": 6,
       // Number of seconds before the email OTP expires (defaults to 1 hour).
-      "otp_expiry": 3600,
+      "otp_expiry": 86400,
 
       // Use a production-ready SMTP server
       // "smtp": {
@@ -282,13 +282,13 @@
       //   "sender_name": "Admin"
       // },
 
-      // Uncomment to customize email template
-      // "template": {
-      //   "invite": {
-      //     "subject": "You have been invited",
-      //     "content_path": "./supabase/templates/invite.html"
-      //   }
-      // },
+      // Same template as the cloud project (see supabase/templates/invite.html).
+      "template": {
+        "invite": {
+          "subject": "Te han invitado a cromodex",
+          "content_path": "./supabase/templates/invite.html"
+        }
+      },
 
       // Uncomment to customize notification email template
       // "notification": {
