@@ -22,6 +22,13 @@
       "when": 1795715351648,
       "tag": "0002_seed_rumbo_a_egghead",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795807938414,
+      "tag": "0003_notifications",
+      "breakpoints": true
     }
   ]
 }

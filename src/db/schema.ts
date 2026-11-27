@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  boolean,
   check,
   index,
   integer,
@@ -226,6 +227,101 @@ export const events = app
       index("events_pending_idx")
         .on(t.createdAt)
         .where(sql`${t.dispatchedAt} is null`),
+    ],
+  )
+  .enableRLS();
+
+// -------------------------------------------------------- notifications
+// Channel-agnostic: a channel is a plain id ("telegram", "console"…) so new
+// ones need no migration. See docs/notifications.md.
+
+/** What a member can switch off. */
+export const notificationTopic = app.enum("notification_topic", ["trades", "wanted"]);
+
+export const deliveryStatus = app.enum("delivery_status", ["pending", "sent", "failed"]);
+
+/** Where each member receives on each channel (Telegram: the chat id). */
+export const notificationDestinations = app
+  .table(
+    "notification_destinations",
+    {
+      userId: uuid()
+        .notNull()
+        .references(() => profiles.id, { onDelete: "cascade" }),
+      channel: text().notNull(),
+      address: text().notNull(),
+      createdAt: createdAt(),
+    },
+    (t) => [
+      primaryKey({ columns: [t.userId, t.channel] }),
+      // One chat belongs to one member.
+      unique("notification_destinations_channel_address_key").on(t.channel, t.address),
+    ],
+  )
+  .enableRLS();
+
+/** A missing row means the topic is on. */
+export const notificationPreferences = app
+  .table(
+    "notification_preferences",
+    {
+      userId: uuid()
+        .notNull()
+        .references(() => profiles.id, { onDelete: "cascade" }),
+      topic: notificationTopic().notNull(),
+      enabled: boolean().notNull(),
+    },
+    (t) => [primaryKey({ columns: [t.userId, t.topic] })],
+  )
+  .enableRLS();
+
+/** One-time codes to link a channel; only the SHA-256 of the code is stored. */
+export const channelLinkTokens = app
+  .table(
+    "channel_link_tokens",
+    {
+      tokenHash: text().primaryKey(),
+      userId: uuid()
+        .notNull()
+        .references(() => profiles.id, { onDelete: "cascade" }),
+      channel: text().notNull(),
+      expiresAt: timestamp({ withTimezone: true }).notNull(),
+      usedAt: timestamp({ withTimezone: true }),
+    },
+  )
+  .enableRLS();
+
+/**
+ * One message to one member on one channel. Unique per (event, user,
+ * channel, kind) so a retried fan-out never sends the same thing twice.
+ */
+export const notificationDeliveries = app
+  .table(
+    "notification_deliveries",
+    {
+      id: uuid().primaryKey().defaultRandom(),
+      eventId: uuid()
+        .notNull()
+        .references(() => events.id, { onDelete: "cascade" }),
+      userId: uuid()
+        .notNull()
+        .references(() => profiles.id, { onDelete: "cascade" }),
+      channel: text().notNull(),
+      kind: text().notNull(),
+      /** Rendered message: { title, body, url }. */
+      message: jsonb().notNull(),
+      status: deliveryStatus().notNull().default("pending"),
+      attempts: integer().notNull().default(0),
+      nextAttemptAt: timestamp({ withTimezone: true }).notNull().defaultNow(),
+      lastError: text(),
+      createdAt: createdAt(),
+      sentAt: timestamp({ withTimezone: true }),
+    },
+    (t) => [
+      unique("notification_deliveries_once_key").on(t.eventId, t.userId, t.channel, t.kind),
+      index("notification_deliveries_pending_idx")
+        .on(t.nextAttemptAt)
+        .where(sql`${t.status} = 'pending'`),
     ],
   )
   .enableRLS();
